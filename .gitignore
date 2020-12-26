@@ -4,3 +4,4 @@ lib
 obj
 packages
 *.config
+.gitignore
