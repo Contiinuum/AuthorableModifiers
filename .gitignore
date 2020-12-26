@@ -1,7 +1,0 @@
-.vs
-bin
-lib
-obj
-packages
-*.config
-.gitignore
