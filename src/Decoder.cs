@@ -166,6 +166,7 @@ namespace AudicaModding
                                         break;
                                     case ModifierType.ArenaBrightness:
                                         if (!Integrations.arenaLoaderFound) continue;
+                                        if (!Config.enableFlashingLights) continue;
                                         modifierCue = new ArenaBrightness(type,
                                             modifiersJSON["modifiers"][i]["startTick"],
                                             modifiersJSON["modifiers"][i]["endTick"],
@@ -174,10 +175,11 @@ namespace AudicaModding
                                             modifiersJSON["modifiers"][i]["option2"]
                                             );
                                         if (!modifiersJSON["modifiers"][i]["option1"] && !modifiersJSON["modifiers"][i]["option2"]) modifierCue.isSingleUseModule = true;
-                                        if (!Config.enableFlashingLights && modifiersJSON["modifiers"][i]["option2"]) continue;
+                                        //if (!Config.enableFlashingLights && modifiersJSON["modifiers"][i]["option2"]) continue;
                                         break;
                                     case ModifierType.Fader:
                                         if (!Integrations.arenaLoaderFound) continue;
+                                        if (!Config.enableFlashingLights) continue;
                                         modifierCue = new Fader(type,
                                             modifiersJSON["modifiers"][i]["startTick"],
                                             modifiersJSON["modifiers"][i]["endTick"],
