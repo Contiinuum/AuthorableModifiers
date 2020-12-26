@@ -1,0 +1,99 @@
+{
+  "_comment": [
+    {
+      "how to determine start and end tick": "You can determine start and end ticks with NotReaper (the number displayed in the bottom left)",
+      "endTick": "If you set the end tick to 0, the modifier will remain active until the song finishes.",
+      "examples": "Below you find one example for every modifier. Delete those you dont need and remove all the comments. You can also delete this whole _comment section",
+      "usage": "unzip your .audica file and create a new .txt file. Name the file 'modifierCues.json' and follow the examples below. Once you're done, zip it back up, including the newly created file, and it'll work.",
+      "usage_2": "make sure the AuthorableModifiers mod is installed if you want to make use of this file. Your map will still work normally if the mod isn't present.",
+      "update modifiers": "update modifiers update values on active modifiers, so make sure you have the appropriate modifier active." 
+    }
+  ],
+  "modifierCues": [
+    {
+      "type": "AimAssist",
+      "startTick": "0",
+      "endTick": "0",
+      "amount": "50" //Aim Assist amount in percent. 0 is none, 100 is full (default)
+    },
+    {
+      "type": "ColorChange",
+      "startTick": "0",
+      "endTick": "0",
+      "leftHandColor": "#ffffff", //hex values. Make sure to include the #
+      "rightHandColor": "#a0a0a0"
+    },
+    {
+      "type": "ColorUpdate",
+      "startTick": "0",
+      "leftHandColor": "#ffffff", //will change active colorchange colors to values set here
+      "rightHandColor": "#a0a0a0" //you can leave one value empty if you only want to update one hand. ex: "rightHandColor": ""
+    },
+    {
+      "type": "ColorSwap",
+      "startTick": "0",
+      "endTick": "0"
+    },
+    {
+      "type": "HiddenTelegraphs",
+      "startTick": "0",
+      "endTick": "0"
+    },
+    {
+      "type": "InvisibleGuns",
+      "startTick": "0",
+      "endTick": "0"
+    },
+    {
+      "type": "Particles",
+      "startTick": "0",
+      "endTick": "0",
+      "amount": "500" //amount of particles in percent. 100 is normal, 50 is half, 200 double, ...
+    },
+    {
+      "type": "Psychedelia",
+      "startTick": "0",
+      "endTick": "0",
+      "amount": "200" //cycle speed. 0 is no cycling, and 1000000 would be epilepsy
+    },
+    {
+      "type": "PsychedeliaUpdate",
+      "startTick": "0",
+      "amount": "200" //will change active psychedelia speed to amount set here
+    }
+    {
+      "type": "Speed",
+      "startTick": "0",
+      "endTick": "0",
+      "amount": "120" //speed is in percent. 100 is default.
+    },
+    {
+      "type": "zOffset",
+      "startTick": "0",
+      "endTick": "0",
+      "amount": "100", //amount of zOffset. Recommended values are between -50 and 150
+      "transitionNumberOfTargets": "10" //how many targets it takes to go from 0 zOffset to the amount of zOffset specified and vice versa
+    },
+    {
+      "type": "ArenaRotation",
+      "startTick": "0",
+      "endTick": "0",
+      "amount": "5", //use a rather low value here. 10 is probably the max you should go unless you want to make people throw up (if in combination with continuous that is)
+      "continuous": "true" //true will rotate until end tick, false will change rotation once
+    },
+    {
+      "type": "ArenaBrightness",
+      "startTick": "0",
+      "endTick": "0",
+      "amount": "80", //0 is black, 80 is around default. going higher isn't necessarily a good idea
+      "continuous": "true", //true will go from 0-100 and back until end tick at speed set in amount. false will change brightness once
+      "strobo": "false" //will rapidly flash the light at speed set in amount
+    },
+    {
+      "type": "Fader", //fades brightness from what it's currently at to what you set as amount until endTick
+      "startTick": "0",
+      "endTick": "0",
+      "amount": "80" //0 is black, 80 is around default. going higher isn't necessarily a good idea
+    }
+  ]
+}
