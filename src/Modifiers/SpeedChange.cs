@@ -65,7 +65,7 @@ namespace AudicaModding
                         yield break;
                     }
                 }*/
-                if (amount >= 1f) ScoreKeeper.I.GetScoreValidity();
+                ScoreKeeper.I.GetScoreValidity();
                 //progress++;
                 yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }

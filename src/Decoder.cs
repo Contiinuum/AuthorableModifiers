@@ -141,6 +141,7 @@ namespace AudicaModding
                                             );
                                         break;
                                     case ModifierType.zOffset:
+                                        if (modifiersJSON["modifiers"][i]["option1"]) continue;
                                         float transitionAmount = 0f;
                                         float.TryParse(modifiersJSON["modifiers"][i]["value1"], out transitionAmount);
                                         modifierCue = new ZOffset(type,
@@ -159,9 +160,10 @@ namespace AudicaModding
                                             modifiersJSON["modifiers"][i]["startTick"],
                                             modifiersJSON["modifiers"][i]["endTick"],
                                             modifiersJSON["modifiers"][i]["amount"],
-                                            modifiersJSON["modifiers"][i]["option1"]
+                                            modifiersJSON["modifiers"][i]["option1"],
+                                            modifiersJSON["modifiers"][i]["option2"]
                                             );
-                                        if (!modifiersJSON["modifiers"][i]["option1"]) modifierCue.isSingleUseModule = true;
+                                        if (!modifiersJSON["modifiers"][i]["option1"] && !modifiersJSON["modifiers"][i]["option2"]) modifierCue.isSingleUseModule = true;
                                         else modifierCue.amount /= p;
                                         break;
                                     case ModifierType.ArenaBrightness:

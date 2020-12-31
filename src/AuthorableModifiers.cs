@@ -64,7 +64,7 @@ namespace AudicaModding
             {
                 m.Activate();
             }
-            zOffsetList.Clear();
+            //zOffsetList.Clear();
         }
 
         public static void LoadModifierCues(bool fromRestart = false)
@@ -140,13 +140,14 @@ namespace AudicaModding
             awaitDisableModifiers.Clear();
             awaitEnableModifiers.Clear();
             preloadModifiers.Clear();
+            zOffsetList.Clear();
             activePsychedelia = null;
             activeColorChange = null;
             if (oldColorsSet) new ColorChange(ModifierType.ColorChange, 0, 0, new float[] { 0f, 0f, 0f}, new float[] { 0f, 0f, 0f}).UpdateColors(oldLeftHandColor, oldRightHandColor);
             if (Integrations.arenaLoaderFound)
             {
-                RenderSettings.skybox.SetFloat("_Exposure", userArenaBrightness);
-                RenderSettings.skybox.SetFloat("_Rotation", userArenaRotation);
+                //RenderSettings.skybox.SetFloat("_Exposure", userArenaBrightness);
+                //RenderSettings.skybox.SetFloat("_Rotation", userArenaRotation);
                 AudicaMod.currentSkyboxExposure = userArenaBrightness;
                 AudicaMod.currentSkyboxRotation = userArenaRotation;
                 if (oldArena.Length > 0)
@@ -154,7 +155,18 @@ namespace AudicaModding
                     PlayerPreferences.I.Environment.Set(oldArena);
                     EnvironmentLoader.I.SwitchEnvironment();
                 }
+                MelonCoroutines.Start(IResetArenaValues());
             }
+        }
+
+        private static IEnumerator IResetArenaValues()
+        {
+            while (EnvironmentLoader.I.IsSwitching())
+            {
+                yield return new WaitForSecondsRealtime(.2f);
+            }
+            RenderSettings.skybox.SetFloat("_Exposure", userArenaBrightness);
+            RenderSettings.skybox.SetFloat("_Rotation", userArenaRotation);
         }
 
         public override void OnUpdate()

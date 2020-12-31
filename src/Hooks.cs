@@ -141,7 +141,12 @@ namespace AudicaModding
             private static bool Prefix(ScoreKeeper __instance, ref ScoreKeeper.ScoreValidity __result)
             {
                 if (!AuthorableModifiers.modifiersFound) return false;
-                else return true;
+                else
+                {
+                    __result = ScoreKeeper.ScoreValidity.Valid;
+                    __instance.mHasInvalidatedScore = false;
+                    return true;
+                }
             }
         }
 
