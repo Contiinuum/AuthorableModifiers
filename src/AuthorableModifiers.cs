@@ -35,7 +35,7 @@ namespace AudicaModding
             public const string Name = "AuthorableModifiers";  // Name of the Mod.  (MUST BE SET)
             public const string Author = "Continuum"; // Author of the Mod.  (Set as null if none)
             public const string Company = null; // Company that made the Mod.  (Set as null if none)
-            public const string Version = "1.1.3"; // Version of the Mod.  (MUST BE SET)
+            public const string Version = "1.1.4"; // Version of the Mod.  (MUST BE SET)
             public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
         }
 
@@ -145,7 +145,16 @@ namespace AudicaModding
         public static void SetOldOffsets()
         {
             SongCues.Cue[] songCues = SongCues.I.mCues.cues;
-            foreach (SongCues.Cue c in songCues) oldOffsetDict.Add(c.tick + (int)c.handType, c.zOffset);
+            foreach (SongCues.Cue c in songCues)
+            {
+                if(c.behavior != Target.TargetBehavior.Dodge && c.behavior != Target.TargetBehavior.Melee)
+                {
+                    int key = c.tick + (int)c.handType;
+                    if(!oldOffsetDict.ContainsKey(key)) oldOffsetDict.Add(key, c.zOffset);
+                }
+               
+            }
+               
         }
 
         private static void ResetValues()

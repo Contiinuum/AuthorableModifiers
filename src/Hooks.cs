@@ -40,6 +40,7 @@ namespace AudicaModding
             private static void Postfix(SongCues __instance)
             {
                 if (KataConfig.I.practiceMode) return;
+                if (!AuthorableModifiers.modifiersFound) return;
                 AuthorableModifiers.ApplyZOffset();
                 //AuthorableModifiers.LoadModifierCues();
             }

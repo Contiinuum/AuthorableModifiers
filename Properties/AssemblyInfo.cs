@@ -18,7 +18,7 @@ using AudicaModding;
 [assembly: AssemblyFileVersion(AuthorableModifiers.BuildInfo.Version)]
 [assembly: NeutralResourcesLanguage("en")]
 [assembly: MelonInfo(typeof(AuthorableModifiers), AuthorableModifiers.BuildInfo.Name, AuthorableModifiers.BuildInfo.Version, AuthorableModifiers.BuildInfo.Author, AuthorableModifiers.BuildInfo.DownloadLink)]
-[assembly: MelonOptionalDependencies("ArenaLoader")]
+[assembly: MelonOptionalDependencies("ArenaLoader", "ScoreOverlay")]
 
 
 // Create and Setup a MelonModGame to mark a Mod as Universal or Compatible with specific Games.
