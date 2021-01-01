@@ -15,13 +15,13 @@ namespace AudicaModding
 
         public virtual void Activate()
         {
-            MelonLogger.Log(type.ToString() + " activated");
+            //MelonLogger.Log(type.ToString() + " activated");
             active = true;      
         }
 
         public virtual void Deactivate()
         {
-            MelonLogger.Log(type.ToString() + " deactivated");
+            //MelonLogger.Log(type.ToString() + " deactivated");
             active = false;
         }      
     }

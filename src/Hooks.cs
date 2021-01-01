@@ -70,15 +70,6 @@ namespace AudicaModding
             }
         }
 
-        [HarmonyPatch(typeof(MenuState), "SetState", new Type[] { typeof(MenuState.State) })]
-        private static class PatchSetMenuState
-        {
-            private static void Prefix(MenuState __instance, ref MenuState.State state)
-            {
-                //if (state != MenuState.State.Launched && MenuState.sLastState == MenuState.State.Launched) AuthorableModifiers.Reset();
-            }
-        }
-
         [HarmonyPatch(typeof(InGameUI), "Restart")]
         private static class PatchRestart
         {

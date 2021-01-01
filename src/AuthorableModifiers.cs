@@ -14,6 +14,7 @@ namespace AudicaModding
         public static List<Modifier> awaitDisableModifiers = new List<Modifier>();
         public static List<Modifier> preloadModifiers = new List<Modifier>();
         public static List<Modifier> zOffsetList = new List<Modifier>();
+        public static Dictionary<int, float> oldOffsetDict = new Dictionary<int, float>();
         public static string audicaFilePath = "";
         public static bool modifiersFound = false;
 
@@ -34,7 +35,7 @@ namespace AudicaModding
             public const string Name = "AuthorableModifiers";  // Name of the Mod.  (MUST BE SET)
             public const string Author = "Continuum"; // Author of the Mod.  (Set as null if none)
             public const string Company = null; // Company that made the Mod.  (Set as null if none)
-            public const string Version = "1.1.2"; // Version of the Mod.  (MUST BE SET)
+            public const string Version = "1.1.3"; // Version of the Mod.  (MUST BE SET)
             public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
         }
 
@@ -65,11 +66,11 @@ namespace AudicaModding
 
         public static void ApplyZOffset()
         {
+            SetOldOffsets();
             foreach(Modifier m in zOffsetList)
             {
                 m.Activate();
             }
-            //zOffsetList.Clear();
         }
 
         public static void LoadModifierCues(bool fromRestart = false)
@@ -124,7 +125,6 @@ namespace AudicaModding
         public static void OnRestart()
         {
             if (!Config.enabled) return;
-            if (KataConfig.I.practiceMode) return;
             if (!modifiersFound) return;          
             ResetValues();
             LoadModifierCues();
@@ -133,13 +133,19 @@ namespace AudicaModding
         public static void Reset()
         {
             if (!Config.enabled) return;
-            if (KataConfig.I.practiceMode) return;
             if (!modifiersFound) return;
             modifiersFound = false;
             ResetValues();
             oldColorsSet = false;
             oldArenaSet = false;
             zOffsetList.Clear();
+            oldOffsetDict.Clear();
+        }
+
+        public static void SetOldOffsets()
+        {
+            SongCues.Cue[] songCues = SongCues.I.mCues.cues;
+            foreach (SongCues.Cue c in songCues) oldOffsetDict.Add(c.tick + (int)c.handType, c.zOffset);
         }
 
         private static void ResetValues()
@@ -180,7 +186,6 @@ namespace AudicaModding
         public override void OnUpdate()
         {
             if (!Config.enabled) return;
-            if (KataConfig.I.practiceMode) return;
             if (MenuState.sState != MenuState.State.Launched) return;
             if (!modifiersFound) return;
             if (AudioDriver.I is null) return;

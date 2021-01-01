@@ -11,8 +11,6 @@ namespace AudicaModding
 {
     public class ZOffset : Modifier
     {
-        private Dictionary<int, float> oldOffsets = new Dictionary<int, float>();
-        //private Direction direction = Direction.Up;
         public float transitionNumberOfTargets;
         private bool endTickSet;
 
@@ -41,8 +39,7 @@ namespace AudicaModding
 
         public void SetZOffset(float zOffset)
         {
-            SongCues.Cue[] songCues = SongCues.I.mCues.cues;
-            //float count = 20f;
+            SongCues.Cue[] songCues = SongCues.I.mCues.cues;            
             float currentCount = 1f;
             for (int i = 0; i < songCues.Length; i++)
             {
@@ -57,61 +54,11 @@ namespace AudicaModding
                     else
                     {
                         songCues[i].zOffset = zOffset;
-                    }                                      
+                    }
+                    songCues[i].zOffset += AuthorableModifiers.oldOffsetDict[songCues[i].tick + (int)songCues[i].handType];
                     if(currentCount < transitionNumberOfTargets) currentCount++;
                 }
-                //songCues[i].target.transform.position = TargetSpawnerLayoutUtil.I.GetPosition(songCues[i].pitch, songCues[i].gridOffset, songCues[i].zOffset);
-                //songCues[i].target.transform.rotation = TargetSpawnerLayoutUtil.GetRotation(songCues[i].pitch, songCues[i].gridOffset);
             }
-
-            //direction = Direction.Down;
-        }
-
-        /* public void SetZOffset(float zOffset)
-         {
-             SongCues.Cue[] songCues = SongCues.I.mCues.cues;
-             float currentTick = AudioDriver.I.mCachedTick;
-             //float count = 20f;
-             float currentCount = 1f;
-             for (int i = 0; i < songCues.Length; i++)
-             {
-                 if (songCues[i].tick > endTick) return;
-                 if (songCues[i].tick < currentTick) continue;
-
-                 if(songCues[i].behavior != Target.TargetBehavior.Melee && songCues[i].behavior != Target.TargetBehavior.Dodge)
-                 {
-
-                     if(direction == Direction.Up)
-                     {
-                         if(!oldOffsets.ContainsKey(songCues[i].tick + songCues[i].pitch))
-                         {
-                             oldOffsets.Add(songCues[i].tick + songCues[i].pitch, songCues[i].zOffset);
-                         }
-                         if (transitionNumberOfTargets > 0) songCues[i].zOffset = Mathf.Lerp(songCues[i].zOffset, zOffset + songCues[i].zOffset, currentCount / (float)transitionNumberOfTargets);
-                         else songCues[i].zOffset = zOffset;
-
-                     }
-
-                     else
-                     {
-                         if (!oldOffsets.ContainsKey(songCues[i].tick + songCues[i].pitch)) continue;
-                         if (transitionNumberOfTargets > 0) songCues[i].zOffset = Mathf.Lerp(songCues[i].zOffset, oldOffsets[songCues[i].tick + songCues[i].pitch], currentCount / (float)transitionNumberOfTargets);
-                         else songCues[i].zOffset = zOffset;
-                     }
-
-                     currentCount++;
-                 }
-                 //songCues[i].target.transform.position = TargetSpawnerLayoutUtil.I.GetPosition(songCues[i].pitch, songCues[i].gridOffset, songCues[i].zOffset);
-                 //songCues[i].target.transform.rotation = TargetSpawnerLayoutUtil.GetRotation(songCues[i].pitch, songCues[i].gridOffset);
-             }
-
-             direction = Direction.Down;
-         }     */
-
-        private enum Direction
-        {
-            Up,
-            Down
         }
     }
 }
