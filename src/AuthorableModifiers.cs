@@ -24,6 +24,7 @@ namespace AudicaModding
         public static Color oldRightHandColor;
         public static bool oldColorsSet = false;
         public static bool oldArenaSet = false;
+        public static bool arenaBrightnessSet = false;
         public static float defaultArenaBrightness = .5f;
         public static float userArenaBrightness = .5f;
         public static float userArenaRotation = 0f;
@@ -33,7 +34,7 @@ namespace AudicaModding
             public const string Name = "AuthorableModifiers";  // Name of the Mod.  (MUST BE SET)
             public const string Author = "Continuum"; // Author of the Mod.  (Set as null if none)
             public const string Company = null; // Company that made the Mod.  (Set as null if none)
-            public const string Version = "1.0.0"; // Version of the Mod.  (MUST BE SET)
+            public const string Version = "1.1.2"; // Version of the Mod.  (MUST BE SET)
             public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
         }
 
@@ -51,11 +52,15 @@ namespace AudicaModding
 
         public static IEnumerator ISetDefaultArenaBrightness()
         {
+            if (!Config.enabled) yield break;
+            if (KataConfig.I.practiceMode) yield break;
+            if (arenaBrightnessSet) yield break;
             while (EnvironmentLoader.I.IsSwitching())
             {
                 yield return new WaitForSecondsRealtime(.2f);
             }
             defaultArenaBrightness = RenderSettings.skybox.GetFloat("_Exposure");
+            arenaBrightnessSet = true;
         }
 
         public static void ApplyZOffset()
@@ -70,6 +75,7 @@ namespace AudicaModding
         public static void LoadModifierCues(bool fromRestart = false)
         {
             if (!Config.enabled) return;
+            if (KataConfig.I.practiceMode) return;
             Reset();
             MelonLogger.Log("Loading modifierCues.json...");
             if (audicaFilePath.Length == 0)
@@ -118,6 +124,7 @@ namespace AudicaModding
         public static void OnRestart()
         {
             if (!Config.enabled) return;
+            if (KataConfig.I.practiceMode) return;
             if (!modifiersFound) return;          
             ResetValues();
             LoadModifierCues();
@@ -126,11 +133,13 @@ namespace AudicaModding
         public static void Reset()
         {
             if (!Config.enabled) return;
+            if (KataConfig.I.practiceMode) return;
             if (!modifiersFound) return;
             modifiersFound = false;
             ResetValues();
             oldColorsSet = false;
             oldArenaSet = false;
+            zOffsetList.Clear();
         }
 
         private static void ResetValues()
@@ -140,7 +149,6 @@ namespace AudicaModding
             awaitDisableModifiers.Clear();
             awaitEnableModifiers.Clear();
             preloadModifiers.Clear();
-            zOffsetList.Clear();
             activePsychedelia = null;
             activeColorChange = null;
             if (oldColorsSet) new ColorChange(ModifierType.ColorChange, 0, 0, new float[] { 0f, 0f, 0f}, new float[] { 0f, 0f, 0f}).UpdateColors(oldLeftHandColor, oldRightHandColor);
@@ -172,6 +180,7 @@ namespace AudicaModding
         public override void OnUpdate()
         {
             if (!Config.enabled) return;
+            if (KataConfig.I.practiceMode) return;
             if (MenuState.sState != MenuState.State.Launched) return;
             if (!modifiersFound) return;
             if (AudioDriver.I is null) return;

@@ -156,7 +156,8 @@ namespace AudicaModding
             private static void Postfix(EnvironmentLoader __instance)
             {
                 if (!Config.enabled) return;
-                MelonLoader.MelonCoroutines.Start(AuthorableModifiers.ISetDefaultArenaBrightness());
+                if(MenuState.sState == MenuState.State.SettingsPage)
+                    MelonLoader.MelonCoroutines.Start(AuthorableModifiers.ISetDefaultArenaBrightness());
             }
         }
     }
