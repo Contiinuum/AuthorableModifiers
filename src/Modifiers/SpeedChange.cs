@@ -31,6 +31,7 @@ namespace AudicaModding
         public override void Deactivate()
         {
             base.Deactivate();
+            ScoreKeeper.I.GetScoreValidity();
             //MelonCoroutines.Start(TempoRamp());
         }
 

@@ -30,6 +30,8 @@ namespace AudicaModding
             {
                 if (fieldInfo.FieldType == typeof(bool)) fieldInfo.SetValue(null, MelonPrefs.GetBool(Category, fieldInfo.Name));
             }
+
+            AuthorableModifiers.modifiersFound = false;
         }
     }
 }
