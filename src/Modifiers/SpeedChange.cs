@@ -14,12 +14,14 @@ namespace AudicaModding
     {
         private RampMode rampmode = RampMode.Up;
         private bool tempoRampActive = false;
+        private bool isOST = false;
         public SpeedChange(ModifierType _type, float _startTick, float _endTick, float _amount)
         {
             type = _type;
             startTick = _startTick;
             endTick = _endTick;
             amount = _amount;
+            isOST = SongDataHolder.I.songData.IsCoreSong() || SongDataHolder.I.songData.dlc;
         }
 
         public override void Activate()
@@ -31,7 +33,7 @@ namespace AudicaModding
         public override void Deactivate()
         {
             base.Deactivate();
-            ScoreKeeper.I.GetScoreValidity();
+            if(amount < 1f || isOST) ScoreKeeper.I.GetScoreValidity();
             //MelonCoroutines.Start(TempoRamp());
         }
 
@@ -66,7 +68,7 @@ namespace AudicaModding
                         yield break;
                     }
                 }*/
-                ScoreKeeper.I.GetScoreValidity();
+                if(amount < 1f || isOST) ScoreKeeper.I.GetScoreValidity();
                 //progress++;
                 yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }
