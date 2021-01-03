@@ -33,7 +33,7 @@ namespace AudicaModding
         public override void Deactivate()
         {
             base.Deactivate();
-            if(amount < 1f || isOST) ScoreKeeper.I.GetScoreValidity();
+            if(amount >= 1f && !isOST) ScoreKeeper.I.GetScoreValidity();
             //MelonCoroutines.Start(TempoRamp());
         }
 
@@ -68,7 +68,7 @@ namespace AudicaModding
                         yield break;
                     }
                 }*/
-                if(amount < 1f || isOST) ScoreKeeper.I.GetScoreValidity();
+                if (amount >= 1f && !isOST) ScoreKeeper.I.GetScoreValidity();
                 //progress++;
                 yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }
