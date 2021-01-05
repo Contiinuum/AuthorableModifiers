@@ -139,6 +139,7 @@ namespace AudicaModding
                                             modifiersJSON["modifiers"][i]["endTick"],
                                             modifiersJSON["modifiers"][i]["amount"] / p
                                             );
+                                        if (modifierCue.amount < 1f && !Config.enableScoreDisablingModifiers) continue;
                                         break;
                                     case ModifierType.zOffset:
                                         if (modifiersJSON["modifiers"][i]["option1"]) continue;

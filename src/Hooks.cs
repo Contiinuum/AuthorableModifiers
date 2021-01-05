@@ -149,7 +149,20 @@ namespace AudicaModding
             {
                 if (!Config.enabled) return;
                 if(MenuState.sState == MenuState.State.SettingsPage)
+                {
                     MelonLoader.MelonCoroutines.Start(AuthorableModifiers.ISetDefaultArenaBrightness());
+                }
+                   
+            }
+        }
+
+        [HarmonyPatch(typeof(LaunchPanel), "Play")]
+        private static class PatchPlay
+        {
+            private static void Postfix(LaunchPanel __instance)
+            {
+                if (!Config.enabled || !AuthorableModifiers.modifiersFound) return;
+                AuthorableModifiers.DestroyWarning();
             }
         }
     }

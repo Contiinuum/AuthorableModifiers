@@ -32,7 +32,12 @@ namespace AudicaModding
             AuthorableModifiers.SetOldArena(oldArena);
             foreach (string option in options)
             {
-                if(ChangeArena(option)) break;
+                if (ChangeArena(option))
+                {
+                    MelonCoroutines.Start(AuthorableModifiers.ISetDefaultArenaBrightness());
+                    break;
+                }
+                   
             }              
         }
 

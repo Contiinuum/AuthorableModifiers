@@ -18,6 +18,8 @@ namespace AudicaModding
         public static string audicaFilePath = "";
         public static bool modifiersFound = false;
 
+        public static Vector3 debugTextPosition = new Vector3(0f, 8f, 8f);
+
         public static Psychedelia activePsychedelia = null;
         public static ColorChange activeColorChange = null;
         public static string oldArena = "";
@@ -30,12 +32,14 @@ namespace AudicaModding
         public static float userArenaBrightness = .5f;
         public static float userArenaRotation = 0f;
 
+        public static DebugTextPopup warningText = null;
+
         public static class BuildInfo
         {
             public const string Name = "AuthorableModifiers";  // Name of the Mod.  (MUST BE SET)
             public const string Author = "Continuum"; // Author of the Mod.  (Set as null if none)
             public const string Company = null; // Company that made the Mod.  (Set as null if none)
-            public const string Version = "1.1.4"; // Version of the Mod.  (MUST BE SET)
+            public const string Version = "1.1.5"; // Version of the Mod.  (MUST BE SET)
             public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
         }
 
@@ -99,6 +103,8 @@ namespace AudicaModding
             MelonLogger.Log("Modifiers loaded.");
             awaitEnableModifiers.Sort((mod1, mod2) => mod1.startTick.CompareTo(mod2.startTick));
             modifiersFound = true;
+            if(Config.enableFlashingLights || Config.enableArenaRotation)
+                DebugWarningText("<color=\"red\">WARNING</color>\nMay contain flashing lights and rotating arenas. \nGo to Mod Settings if you want to disable that.", .001f);
         }
 
         public static void SetOldArena(string arena)
@@ -106,6 +112,19 @@ namespace AudicaModding
             if (oldArenaSet) return;
             oldArena = arena;
             oldArenaSet = true;
+        }
+
+        public static void DebugWarningText(string text, float speed)
+        {
+            warningText = KataConfig.I.CreateDebugText(text, debugTextPosition, 4f, null, false, speed);
+        }
+
+        public static void DestroyWarning()
+        {
+            if(warningText != null)
+            {
+                GameObject.Destroy(warningText.transform.root.gameObject);
+            }
         }
 
         public static void SetOldColors(Color l, Color r)
@@ -136,6 +155,7 @@ namespace AudicaModding
             if (!modifiersFound) return;
             modifiersFound = false;
             ResetValues();
+            DestroyWarning();
             oldColorsSet = false;
             oldArenaSet = false;
             zOffsetList.Clear();

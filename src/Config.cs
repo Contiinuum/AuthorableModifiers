@@ -11,6 +11,7 @@ namespace AudicaModding
         public static bool enableColorChange;
         public static bool enableFlashingLights;
         public static bool enableArenaRotation;
+        public static bool enableScoreDisablingModifiers;
 
 
 
@@ -20,6 +21,7 @@ namespace AudicaModding
             MelonPrefs.RegisterBool(Category, nameof(enableColorChange), true, "Allows maps to change your colors.");
             MelonPrefs.RegisterBool(Category, nameof(enableFlashingLights), true, "Allows maps to use brightness changes and flashing lights. TURN THIS OFF IF YOU HAVE EPILEPSY!");
             MelonPrefs.RegisterBool(Category, nameof(enableArenaRotation), true, "Allows maps to rotate the arena. TURN THIS OFF IF YOU EASILY SUFFER FROM MOTION SICKNESS!");
+            MelonPrefs.RegisterBool(Category, nameof(enableScoreDisablingModifiers), true, "Disable this if you want to make sure you can post scores on all authorable modifier maps!");
 
             OnModSettingsApplied();
         }
