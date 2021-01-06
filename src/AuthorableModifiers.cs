@@ -103,8 +103,8 @@ namespace AudicaModding
             MelonLogger.Log("Modifiers loaded.");
             awaitEnableModifiers.Sort((mod1, mod2) => mod1.startTick.CompareTo(mod2.startTick));
             modifiersFound = true;
-            if(Config.enableFlashingLights || Config.enableArenaRotation)
-                DebugWarningText("<color=\"red\">WARNING</color>\nMay contain flashing lights and rotating arenas. \nGo to Mod Settings if you want to disable that.", .001f);
+            if((Config.enableFlashingLights || Config.enableArenaRotation) && !fromRestart)
+                MelonCoroutines.Start(IWaitForArenaLoad("<color=\"red\">WARNING</color>\nMay contain flashing lights and rotating arenas. \nGo to Mod Settings if you want to disable that.", .001f));
         }
 
         public static void SetOldArena(string arena)
@@ -112,6 +112,15 @@ namespace AudicaModding
             if (oldArenaSet) return;
             oldArena = arena;
             oldArenaSet = true;
+        }
+
+        private static IEnumerator IWaitForArenaLoad(string text, float speed)
+        {
+            while (EnvironmentLoader.I.IsSwitching())
+            {
+                yield return new WaitForSecondsRealtime(.2f);
+            }
+            DebugWarningText(text, speed);
         }
 
         public static void DebugWarningText(string text, float speed)
@@ -146,7 +155,7 @@ namespace AudicaModding
             if (!Config.enabled) return;
             if (!modifiersFound) return;          
             ResetValues();
-            LoadModifierCues();
+            LoadModifierCues(true);
         }
 
         public static void Reset()
@@ -193,23 +202,29 @@ namespace AudicaModding
                 //RenderSettings.skybox.SetFloat("_Rotation", userArenaRotation);
                 AudicaMod.currentSkyboxExposure = userArenaBrightness;
                 AudicaMod.currentSkyboxRotation = userArenaRotation;
-                if (oldArena.Length > 0)
+                bool resetToUserValues = false;
+                if (oldArena.Length > 0 && oldArenaSet)
                 {
-                    PlayerPreferences.I.Environment.Set(oldArena);
-                    EnvironmentLoader.I.SwitchEnvironment();
+                    if(oldArena != PlayerPreferences.I.Environment.Get())
+                    {
+                        resetToUserValues = true;
+                        PlayerPreferences.I.Environment.Set(oldArena);
+                        EnvironmentLoader.I.SwitchEnvironment();
+                        
+                    }                   
                 }
-                MelonCoroutines.Start(IResetArenaValues());
+                MelonCoroutines.Start(IResetArenaValues(resetToUserValues));
             }
         }
 
-        private static IEnumerator IResetArenaValues()
+        private static IEnumerator IResetArenaValues(bool resetToUserValues)
         {
             while (EnvironmentLoader.I.IsSwitching())
             {
                 yield return new WaitForSecondsRealtime(.2f);
             }
-            RenderSettings.skybox.SetFloat("_Exposure", userArenaBrightness);
-            RenderSettings.skybox.SetFloat("_Rotation", userArenaRotation);
+            RenderSettings.skybox.SetFloat("_Exposure", resetToUserValues ? userArenaBrightness : defaultArenaBrightness);
+            RenderSettings.skybox.SetFloat("_Rotation", resetToUserValues ? userArenaRotation : 0f);
         }
 
         public override void OnUpdate()
