@@ -53,7 +53,7 @@ namespace AuthorableModifiers
                 else if (mod.Assembly.GetName().Name == "AutoLightshow")
                 {
                     var scoreVersion = new Version(mod.Info.Version);
-                    var lastUnsupportedVersion = new Version("0.1.0");
+                    var lastUnsupportedVersion = new Version("1.'.0");
                     var result = scoreVersion.CompareTo(lastUnsupportedVersion);
                     if (result > 0)
                     {
