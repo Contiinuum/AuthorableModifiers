@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public class ColorUpdate : Modifier
     {
@@ -23,7 +23,7 @@ namespace AudicaModding
         public override void Activate()
         {
             base.Activate();
-            if (AuthorableModifiers.activeColorChange != null) AuthorableModifiers.activeColorChange.UpdateColors(leftHandColor, rightHandColor);
+            if (AuthorableModifiersMod.activeColorChange != null) AuthorableModifiersMod.activeColorChange.UpdateColors(leftHandColor, rightHandColor);
         }
 
         public override void Deactivate()

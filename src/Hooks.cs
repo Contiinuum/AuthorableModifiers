@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using Hmx.Audio;
 using UnityEngine;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     internal static class Hooks
     {
@@ -18,7 +18,7 @@ namespace AudicaModding
         {
             private static void Prefix(Target __instance, TargetSpawner.SpawnInfo info, SongCues.Cue cue)
             {
-                if (!AuthorableModifiers.modifiersFound) return;
+                if (!AuthorableModifiersMod.modifiersFound) return;
                 if (!updateChainColor) return;
                 if (cue.behavior != Target.TargetBehavior.Chain) return;
                 if (cue.handType == Target.TargetHandType.Left)
@@ -40,8 +40,8 @@ namespace AudicaModding
             private static void Postfix(SongCues __instance)
             {
                 if (KataConfig.I.practiceMode) return;
-                if (!AuthorableModifiers.modifiersFound) return;
-                AuthorableModifiers.ApplyZOffset();
+                if (!AuthorableModifiersMod.modifiersFound) return;
+                AuthorableModifiersMod.ApplyZOffset();
                 //AuthorableModifiers.LoadModifierCues();
             }
         }
@@ -53,10 +53,19 @@ namespace AudicaModding
             private static void Postfix(SongSelectItem __instance)
             {
                 //Set filePath
-                AuthorableModifiers.audicaFilePath = __instance.mSongData.foundPath;
-                AuthorableModifiers.SetUserBrightness(RenderSettings.skybox.GetFloat("_Exposure"), RenderSettings.skybox.GetFloat("_Rotation"));
-                AuthorableModifiers.LoadModifierCues();
+                AuthorableModifiersMod.audicaFilePath = __instance.mSongData.foundPath;
+                AuthorableModifiersMod.LoadModifierCues();
                 //MelonLoader.MelonLogger.Log(__result.zipPath);
+            }
+        }
+
+        [HarmonyPatch(typeof(OptionsMenu), "ShowPage", new Type[] { typeof(OptionsMenu.Page) })]
+        private static class PatchShowPage
+        {
+            private static void Postfix(OptionsMenu __instance, OptionsMenu.Page page)
+            {
+                if (page == OptionsMenu.Page.Main)
+                    AuthorableModifiersMod.SetUserBrightness(RenderSettings.skybox.GetFloat("_Exposure"), RenderSettings.skybox.GetFloat("_Rotation"), RenderSettings.reflectionIntensity);
             }
         }
 
@@ -66,7 +75,7 @@ namespace AudicaModding
             private static void Postfix(LaunchPanel __instance)
             {
                 //Set filePath
-                AuthorableModifiers.Reset();
+                AuthorableModifiersMod.Reset();
                 //MelonLoader.MelonLogger.Log(__result.zipPath);
             }
         }
@@ -77,8 +86,8 @@ namespace AudicaModding
             private static void Prefix(InGameUI __instance)
             {
                 if (KataConfig.I.practiceMode) return;
-                if (!AuthorableModifiers.modifiersFound) return;
-                AuthorableModifiers.OnRestart();
+                if (!AuthorableModifiersMod.modifiersFound) return;
+                AuthorableModifiersMod.OnRestart();
             }
         }
 
@@ -88,8 +97,8 @@ namespace AudicaModding
             private static void Postfix(InGameUI __instance)
             {
                 if (KataConfig.I.practiceMode) return;
-                if (!AuthorableModifiers.modifiersFound) return;
-                AuthorableModifiers.Reset();
+                if (!AuthorableModifiersMod.modifiersFound) return;
+                AuthorableModifiersMod.Reset();
             }
         }
 
@@ -99,8 +108,8 @@ namespace AudicaModding
             private static void Postfix(InGameUI __instance)
             {
                 if (KataConfig.I.practiceMode) return;
-                if (!AuthorableModifiers.modifiersFound) return;
-                AuthorableModifiers.OnRestart();
+                if (!AuthorableModifiersMod.modifiersFound) return;
+                AuthorableModifiersMod.OnRestart();
             }
         }
 
@@ -110,8 +119,8 @@ namespace AudicaModding
             private static void Postfix(InGameUI __instance)
             {
                 if (KataConfig.I.practiceMode) return;
-                if (!AuthorableModifiers.modifiersFound) return;
-                AuthorableModifiers.OnRestart();
+                if (!AuthorableModifiersMod.modifiersFound) return;
+                AuthorableModifiersMod.OnRestart();
             }
         }
 
@@ -132,7 +141,7 @@ namespace AudicaModding
         {
             private static bool Prefix(ScoreKeeper __instance, ref ScoreKeeper.ScoreValidity __result)
             {
-                if (!AuthorableModifiers.modifiersFound) return false;
+                if (!AuthorableModifiersMod.modifiersFound) return false;
                 else
                 {
                     __result = ScoreKeeper.ScoreValidity.Valid;
@@ -150,7 +159,7 @@ namespace AudicaModding
                 if (!Config.enabled) return;
                 if(MenuState.sState == MenuState.State.SettingsPage)
                 {
-                    MelonLoader.MelonCoroutines.Start(AuthorableModifiers.ISetDefaultArenaBrightness());
+                    MelonLoader.MelonCoroutines.Start(AuthorableModifiersMod.ISetDefaultArenaBrightness());
                 }
                    
             }
@@ -161,8 +170,8 @@ namespace AudicaModding
         {
             private static void Postfix(LaunchPanel __instance)
             {
-                if (!Config.enabled || !AuthorableModifiers.modifiersFound) return;
-                AuthorableModifiers.DestroyWarning();
+                if (!Config.enabled || !AuthorableModifiersMod.modifiersFound) return;
+                AuthorableModifiersMod.DestroyPopup();
             }
         }
     }

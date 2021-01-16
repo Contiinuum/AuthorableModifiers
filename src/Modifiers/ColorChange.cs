@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using MelonLoader;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public class ColorChange : Modifier
     {
@@ -30,14 +30,14 @@ namespace AudicaModding
             base.Activate();      
             ChangeColors(true);
             Hooks.updateChainColor = true;
-            AuthorableModifiers.activeColorChange = this;
+            AuthorableModifiersMod.activeColorChange = this;
         }
 
         public override void Deactivate()
         {
             base.Deactivate();            
             ChangeColors(false);
-            AuthorableModifiers.activeColorChange = null;
+            AuthorableModifiersMod.activeColorChange = null;
         }
 
         public void ChangeColors(bool enable)
@@ -48,7 +48,7 @@ namespace AudicaModding
             {
                 oldLeftHandColor = KataConfig.I.leftHandColor;
                 oldRightHandColor = KataConfig.I.rightHandColor;
-                AuthorableModifiers.SetOldColors(oldLeftHandColor, oldRightHandColor);
+                AuthorableModifiersMod.SetOldColors(oldLeftHandColor, oldRightHandColor);
 
                 lhColor = leftHandColor;
                 rhColor = rightHandColor;

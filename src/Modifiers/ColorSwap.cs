@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using MelonLoader;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public class ColorSwap : Modifier
     {

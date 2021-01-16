@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public class Modifier
     {
@@ -15,13 +15,11 @@ namespace AudicaModding
 
         public virtual void Activate()
         {
-            //MelonLogger.Log(type.ToString() + " activated");
             active = true;      
         }
 
         public virtual void Deactivate()
         {
-            //MelonLogger.Log(type.ToString() + " deactivated");
             active = false;
         }      
     }

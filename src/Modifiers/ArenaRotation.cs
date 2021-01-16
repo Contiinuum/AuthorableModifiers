@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using MelonLoader;
 using UnityEngine;
 using System.Collections;
+using ArenaLoader;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     
     public class ArenaRotation : Modifier
@@ -39,7 +40,7 @@ namespace AudicaModding
             }
             else
             {
-                AudicaMod.RotateSkybox(amount);
+                ArenaLoaderMod.RotateSkybox(amount);
             }
            
         }
@@ -54,7 +55,7 @@ namespace AudicaModding
                 float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
                 float currentRot = Mathf.Lerp(0f, amount, percentage / 100f);
                 //RenderSettings.skybox.SetFloat("_Rotation", currentRot);
-                AudicaMod.RotateSkybox(currentRot);
+                ArenaLoaderMod.RotateSkybox(currentRot);
                 yield return new WaitForSecondsRealtime(.01f);
             }
             yield return null;
@@ -64,7 +65,7 @@ namespace AudicaModding
         {
             while (active)
             {
-                AudicaMod.RotateSkybox(amount);
+                ArenaLoaderMod.RotateSkybox(amount);
                 yield return new WaitForSecondsRealtime(.01f);
             }
             yield return null;

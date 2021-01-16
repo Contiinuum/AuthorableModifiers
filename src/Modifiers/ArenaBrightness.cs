@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using MelonLoader;
 using UnityEngine;
 using System.Collections;
-
-namespace AudicaModding
+using ArenaLoader;
+namespace AuthorableModifiers
 {
 
     public class ArenaBrightness : Modifier
@@ -28,9 +28,11 @@ namespace AudicaModding
         public override void Activate()
         {
             base.Activate();
+            if (!continuous) amount *= Config.intensity;
+
             if (strobo)
             {
-                if (amount == 0f) amount = 1f;
+                //if (amount == 0f) amount = maxBrightness * Config.intensity;
                 MelonCoroutines.Start(DoStrobo());
             }
             else if (continuous)
@@ -39,25 +41,30 @@ namespace AudicaModding
             }
             else
             {
-                AudicaMod.currentSkyboxExposure = 0f;
-                float newExposure = AuthorableModifiers.defaultArenaBrightness / 100f;
+                ArenaLoaderMod.CurrentSkyboxExposure = 0f;
+                float newExposure = AuthorableModifiersMod.defaultArenaBrightness / 100f;
                 newExposure *= amount;
-                AudicaMod.ChangeExposure(newExposure);
+                //if (amount < minBrightness) amount = minBrightness;
+                ArenaLoaderMod.ChangeExposure(newExposure);
             }
 
         }
         private IEnumerator DoStrobo()
         {
             float dir = 1;
-            if (AuthorableModifiers.defaultArenaBrightness / RenderSettings.skybox.GetFloat("_Exposure") >= .5f) dir = 0;          
+            if (AuthorableModifiersMod.defaultArenaBrightness / RenderSettings.skybox.GetFloat("_Exposure") >= .5f) dir = 0;          
             float interval = (480f / amount);
             float nextStrobe = startTick;
             while (active)
             {
                 if(nextStrobe <= AudioDriver.I.mCachedTick)
                 {
-                    AudicaMod.currentSkyboxExposure = 0f;
-                    AudicaMod.ChangeExposure(AuthorableModifiers.defaultArenaBrightness * dir);
+                    ArenaLoaderMod.CurrentSkyboxExposure = 0f;
+                    ArenaLoaderMod.CurrentSkyboxReflection = 0f;
+                    float amnt = AuthorableModifiersMod.defaultArenaBrightness * dir;
+                    if (dir == 1) amnt *= Config.intensity;
+                    ArenaLoaderMod.ChangeExposure(amnt);
+                    ArenaLoaderMod.ChangeReflectionStrength(amnt);
                     if (dir == 1) dir = 0;
                     else if (dir == 0) dir = 1;
                     nextStrobe += interval;
@@ -70,14 +77,15 @@ namespace AudicaModding
         private IEnumerator ExposureChangeContinuous()
         {
             float dir = 1;
-            float newAmount = AuthorableModifiers.defaultArenaBrightness / 1000f;
+            float newAmount = AuthorableModifiersMod.defaultArenaBrightness / 1000f;
             newAmount *= amount;
-            if (AudicaMod.currentSkyboxExposure > AuthorableModifiers.defaultArenaBrightness) AudicaMod.currentSkyboxExposure = AuthorableModifiers.defaultArenaBrightness;
+            if (ArenaLoaderMod.CurrentSkyboxExposure > AuthorableModifiersMod.defaultArenaBrightness) ArenaLoaderMod.CurrentSkyboxExposure = AuthorableModifiersMod.defaultArenaBrightness;
             while (active)
             {
-                if (AudicaMod.currentSkyboxExposure >= AuthorableModifiers.defaultArenaBrightness) dir = -1;
-                else if (AudicaMod.currentSkyboxExposure <= 0f) dir = 1;
-                AudicaMod.ChangeExposure(newAmount * dir);
+                if (ArenaLoaderMod.CurrentSkyboxExposure >= AuthorableModifiersMod.defaultArenaBrightness) dir = -1;
+                else if (ArenaLoaderMod.CurrentSkyboxExposure <= 0f) dir = 1;
+                ArenaLoaderMod.ChangeExposure(newAmount * dir);
+                ArenaLoaderMod.ChangeReflectionStrength(newAmount * dir);
                 
                 yield return new WaitForSecondsRealtime(.01f);
             }
@@ -87,8 +95,10 @@ namespace AudicaModding
         public override void Deactivate()
         {
             base.Deactivate();
-            AudicaMod.currentSkyboxExposure = AuthorableModifiers.defaultArenaBrightness;
-            AudicaMod.ChangeExposure(0f);
+            ArenaLoaderMod.CurrentSkyboxExposure = AuthorableModifiersMod.userArenaBrightness;
+            ArenaLoaderMod.CurrentSkyboxReflection = AuthorableModifiersMod.userArenaReflection;
+            ArenaLoaderMod.ChangeExposure(0f);
+            ArenaLoaderMod.ChangeReflectionStrength(0f);
         }
     }
 }

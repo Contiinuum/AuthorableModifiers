@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using MelonLoader;
 using UnityEngine;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public class SpeedChange : Modifier
     {

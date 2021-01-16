@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MelonLoader;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public class HiddenTelegraphs : Modifier
     {

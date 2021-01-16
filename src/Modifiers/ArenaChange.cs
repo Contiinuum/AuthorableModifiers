@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using MelonLoader;
 using UnityEngine;
 using System.Collections;
+using ArenaLoader;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
 
     public class ArenaChange : Modifier
@@ -29,12 +30,12 @@ namespace AudicaModding
         {
             base.Activate();           
             oldArena = PlayerPreferences.I.Environment.Get();
-            AuthorableModifiers.SetOldArena(oldArena);
+            AuthorableModifiersMod.SetOldArena(oldArena);
             foreach (string option in options)
             {
                 if (ChangeArena(option))
                 {
-                    MelonCoroutines.Start(AuthorableModifiers.ISetDefaultArenaBrightness());
+                    MelonCoroutines.Start(AuthorableModifiersMod.ISetDefaultArenaBrightness());
                     break;
                 }
                    
@@ -60,8 +61,8 @@ namespace AudicaModding
 
         private bool ArenaExists(string currentArena)
         {
-            bool inDefaultArenas = AudicaMod.defaultEnvironments.Contains(currentArena);
-            bool inCustomArenas = AudicaMod.arenaNames.Contains(currentArena);
+            bool inDefaultArenas = ArenaLoaderMod.defaultEnvironments.Contains(currentArena);
+            bool inCustomArenas = ArenaLoaderMod.arenaNames.Contains(currentArena);
             return inDefaultArenas || inCustomArenas;
         }
     }

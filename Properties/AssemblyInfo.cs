@@ -2,23 +2,23 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using MelonLoader;
-using AudicaModding;
+using AuthorableModifiers;
 
-[assembly: AssemblyTitle(AuthorableModifiers.BuildInfo.Name)]
+[assembly: AssemblyTitle(AuthorableModifiersMod.BuildInfo.Name)]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany(AuthorableModifiers.BuildInfo.Company)]
-[assembly: AssemblyProduct(AuthorableModifiers.BuildInfo.Name)]
-[assembly: AssemblyCopyright("Created by " + AuthorableModifiers.BuildInfo.Author)]
-[assembly: AssemblyTrademark(AuthorableModifiers.BuildInfo.Company)]
+[assembly: AssemblyCompany(AuthorableModifiersMod.BuildInfo.Company)]
+[assembly: AssemblyProduct(AuthorableModifiersMod.BuildInfo.Name)]
+[assembly: AssemblyCopyright("Created by " + AuthorableModifiersMod.BuildInfo.Author)]
+[assembly: AssemblyTrademark(AuthorableModifiersMod.BuildInfo.Company)]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 //[assembly: Guid("")]
-[assembly: AssemblyVersion(AuthorableModifiers.BuildInfo.Version)]
-[assembly: AssemblyFileVersion(AuthorableModifiers.BuildInfo.Version)]
+[assembly: AssemblyVersion(AuthorableModifiersMod.BuildInfo.Version)]
+[assembly: AssemblyFileVersion(AuthorableModifiersMod.BuildInfo.Version)]
 [assembly: NeutralResourcesLanguage("en")]
-[assembly: MelonInfo(typeof(AuthorableModifiers), AuthorableModifiers.BuildInfo.Name, AuthorableModifiers.BuildInfo.Version, AuthorableModifiers.BuildInfo.Author, AuthorableModifiers.BuildInfo.DownloadLink)]
-[assembly: MelonOptionalDependencies("ArenaLoader", "ScoreOverlay")]
+[assembly: MelonInfo(typeof(AuthorableModifiersMod), AuthorableModifiersMod.BuildInfo.Name, AuthorableModifiersMod.BuildInfo.Version, AuthorableModifiersMod.BuildInfo.Author, AuthorableModifiersMod.BuildInfo.DownloadLink)]
+[assembly: MelonOptionalDependencies("ArenaLoader", "ScoreOverlay", "AutoLightshow")]
 
 
 // Create and Setup a MelonModGame to mark a Mod as Universal or Compatible with specific Games.

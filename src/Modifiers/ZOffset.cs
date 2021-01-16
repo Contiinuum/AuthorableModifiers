@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using MelonLoader;
 using UnityEngine;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public class ZOffset : Modifier
     {
@@ -55,7 +55,7 @@ namespace AudicaModding
                     {
                         songCues[i].zOffset = zOffset;
                     }
-                    songCues[i].zOffset += AuthorableModifiers.oldOffsetDict[songCues[i].tick + (int)songCues[i].handType];
+                    songCues[i].zOffset += AuthorableModifiersMod.oldOffsetDict[songCues[i].tick + (int)songCues[i].handType];
                     if(currentCount < transitionNumberOfTargets) currentCount++;
                 }
             }

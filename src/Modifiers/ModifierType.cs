@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public enum ModifierType
     {
@@ -23,6 +23,8 @@ namespace AudicaModding
         ArenaBrightness,
         Fader,
         ArenaChange,
-        OverlaySetter
+        OverlaySetter,
+        TextPopup,
+        AutoLighting
     }
 }

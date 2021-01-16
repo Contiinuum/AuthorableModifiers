@@ -7,7 +7,7 @@ using System.IO.Compression;
 using System.IO;
 using SimpleJSON;
 using MelonLoader;
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public static class Decoder
     {
@@ -25,6 +25,7 @@ namespace AudicaModding
                         if (entry.Name == "modifiers.json")
                         {
                             modifierCuesFound = true;
+                            MelonLogger.Log("Loading Modifiers...");
                             break;
                         }
                     }
@@ -118,20 +119,22 @@ namespace AudicaModding
                                             modifiersJSON["modifiers"][i]["amount"] / p
                                             );
                                         break;
-                                    case ModifierType.Psychedelia:                                       
+                                    case ModifierType.Psychedelia:
+                                        if (!Config.enablePsychedelia) continue;
                                         modifierCue = new Psychedelia(type,
                                             modifiersJSON["modifiers"][i]["startTick"],
                                             modifiersJSON["modifiers"][i]["endTick"],
                                             modifiersJSON["modifiers"][i]["amount"]
                                             );
-                                        if (!Config.enableFlashingLights && modifierCue.amount > 2000f) continue;
+                                        if (!Config.enableFlashingLights && modifierCue.amount > 500f) continue;
                                             break;
                                     case ModifierType.PsychedeliaUpdate:
+                                        if (!Config.enablePsychedelia) continue;
                                         modifierCue = new PsychedeliaUpdate(type,
                                             modifiersJSON["modifiers"][i]["startTick"],
                                             modifiersJSON["modifiers"][i]["amount"]
                                             );
-                                        if (!Config.enableFlashingLights && modifierCue.amount > 2000f) continue;
+                                        if (!Config.enableFlashingLights && modifierCue.amount > 500f) continue;
                                         break;
                                     case ModifierType.Speed:
                                         modifierCue = new SpeedChange(type,
@@ -152,7 +155,7 @@ namespace AudicaModding
                                             transitionAmount
                                             );
                                         modifierCue.isSingleUseModule = true;
-                                        AuthorableModifiers.zOffsetList.Add(modifierCue);
+                                        AuthorableModifiersMod.zOffsetList.Add(modifierCue);
                                         continue;
                                       case ModifierType.ArenaRotation:
                                         if (!Integrations.arenaLoaderFound) continue;
@@ -210,12 +213,34 @@ namespace AudicaModding
                                             );
                                         modifierCue.isSingleUseModule = true;
                                         break;
+                                    case ModifierType.TextPopup:
+                                        modifierCue = new TextPopup(type,
+                                            modifiersJSON["modifiers"][i]["startTick"],
+                                            modifiersJSON["modifiers"][i]["endTick"],
+                                            modifiersJSON["modifiers"][i]["value1"],
+                                            modifiersJSON["modifiers"][i]["value2"],
+                                            modifiersJSON["modifiers"][i]["option1"]);
+                                        break;
+                                    case ModifierType.AutoLighting:
+                                        if (!Integrations.arenaLoaderFound) continue;
+                                        if (!Config.enableFlashingLights) continue;
+                                        modifierCue = new AutoLighting(type,
+                                            modifiersJSON["modifiers"][i]["startTick"],
+                                            modifiersJSON["modifiers"][i]["endTick"],
+                                            modifiersJSON["modifiers"][i]["amount"] / p,
+                                            modifiersJSON["modifiers"][i]["option1"]);
+                                        break;
                                     default:
                                         break;
                                 }
-                                if (modifierCue.endTick == 0) modifierCue.isSingleUseModule = true;
+                                if (modifierCue.endTick == 0)
+                                {
+                                    modifierCue.isSingleUseModule = true;
+                                    AuthorableModifiersMod.singleUseModifiers.Add(modifierCue);
+                                }
+                                    
                                 //if (modifierCue.endTick == 0) modifierCue.endTick = _endTick;
-                                if (preload) AuthorableModifiers.preloadModifiers.Add(modifierCue);
+                                if (preload) AuthorableModifiersMod.preloadModifiers.Add(modifierCue);
                                 else modifiers.Add(modifierCue);
 
                             }

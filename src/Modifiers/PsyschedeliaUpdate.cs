@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public class PsychedeliaUpdate : Modifier
     {
@@ -21,8 +21,8 @@ namespace AudicaModding
         {
             amount /= 50f;
             base.Activate();
-            if (AuthorableModifiers.activePsychedelia is null) return;
-            AuthorableModifiers.activePsychedelia.amount = amount;
+            if (AuthorableModifiersMod.activePsychedelia is null) return;
+            AuthorableModifiersMod.activePsychedelia.amount = amount;
         }
 
         public override void Deactivate()

@@ -42,6 +42,9 @@
       <HintPath>lib\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="AutoLightshow">
+      <HintPath>D:\Games\Steam\steamapps\common\Audica\Mods\AutoLightshow.dll</HintPath>
+    </Reference>
     <Reference Include="Il2CppMono.Security">
       <HintPath>lib\Il2CppMono.Security.dll</HintPath>
       <Private>False</Private>
@@ -201,6 +204,7 @@
     <Compile Include="src\Modifiers\ArenaBrightness.cs" />
     <Compile Include="src\Modifiers\ArenaChange.cs" />
     <Compile Include="src\Modifiers\ArenaRotation.cs" />
+    <Compile Include="src\Modifiers\AutoLighting.cs" />
     <Compile Include="src\Modifiers\ColorSwap.cs" />
     <Compile Include="src\Modifiers\ColorUpdate.cs" />
     <Compile Include="src\Modifiers\Fader.cs" />
@@ -214,6 +218,7 @@
     <Compile Include="src\Modifiers\ColorChange.cs" />
     <Compile Include="src\Modifiers\PsyschedeliaUpdate.cs" />
     <Compile Include="src\Modifiers\SpeedChange.cs" />
+    <Compile Include="src\Modifiers\TextPopup.cs" />
     <Compile Include="src\Modifiers\ZOffset.cs" />
     <Compile Include="src\Decoder.cs" />
   </ItemGroup>

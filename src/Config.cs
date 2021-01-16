@@ -1,7 +1,7 @@
 ﻿using MelonLoader;
 using System.Reflection;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public static class Config
     {
@@ -9,10 +9,14 @@ namespace AudicaModding
 
         public static bool enabled;
         public static bool enableColorChange;
+        public static bool enablePsychedelia;
         public static bool enableFlashingLights;
         public static bool enableArenaRotation;
         public static bool enableScoreDisablingModifiers;
+        public static bool hideWarning;
 
+        public static string lightingTitle = "[Header]Lighting Options";
+        public static float intensity;
 
 
         public static void RegisterConfig()
@@ -21,7 +25,12 @@ namespace AudicaModding
             MelonPrefs.RegisterBool(Category, nameof(enableColorChange), true, "Allows maps to change your colors.");
             MelonPrefs.RegisterBool(Category, nameof(enableFlashingLights), true, "Allows maps to use brightness changes and flashing lights. TURN THIS OFF IF YOU HAVE EPILEPSY!");
             MelonPrefs.RegisterBool(Category, nameof(enableArenaRotation), true, "Allows maps to rotate the arena. TURN THIS OFF IF YOU EASILY SUFFER FROM MOTION SICKNESS!");
-            MelonPrefs.RegisterBool(Category, nameof(enableScoreDisablingModifiers), true, "Disable this if you want to make sure you can post scores on all authorable modifier maps!");
+            MelonPrefs.RegisterBool(Category, nameof(enablePsychedelia), true, "Allows maps to make use of Psychedelia.");
+            MelonPrefs.RegisterBool(Category, nameof(enableScoreDisablingModifiers), true, "Allows mods to use modifiers that disable posting your score to the leaderboards.");
+            MelonPrefs.RegisterBool(Category, nameof(hideWarning), true, "Hides the warning before starting a song.");
+
+            MelonPrefs.RegisterString(Category, nameof(lightingTitle), "", lightingTitle);
+            MelonPrefs.RegisterFloat(Category, nameof(intensity), 1f, "Controls how intense lighting modifiers are. [0.1, 1, 0.1, 1]{P}");
 
             OnModSettingsApplied();
         }
@@ -30,10 +39,13 @@ namespace AudicaModding
         {
             foreach (var fieldInfo in typeof(Config).GetFields(BindingFlags.Static | BindingFlags.Public))
             {
+                if (fieldInfo.Name == "Category") continue;
                 if (fieldInfo.FieldType == typeof(bool)) fieldInfo.SetValue(null, MelonPrefs.GetBool(Category, fieldInfo.Name));
+                else if (fieldInfo.FieldType == typeof(float)) fieldInfo.SetValue(null, MelonPrefs.GetFloat(Category, fieldInfo.Name));
+                else if (fieldInfo.FieldType == typeof(string)) fieldInfo.SetValue(null, MelonPrefs.GetString(Category, fieldInfo.Name));
             }
 
-            AuthorableModifiers.modifiersFound = false;
+            AuthorableModifiersMod.modifiersFound = false;
         }
     }
 }

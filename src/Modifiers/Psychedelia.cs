@@ -8,7 +8,7 @@ using UnityEngine;
 using MelonLoader;
 using System.Threading;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
     public class Psychedelia : Modifier
     {
@@ -26,14 +26,14 @@ namespace AudicaModding
         public override void Activate()
         {
             amount /= 20f;
-            AuthorableModifiers.activePsychedelia = this;
+            AuthorableModifiersMod.activePsychedelia = this;
             base.Activate();
             MelonCoroutines.Start(DoPsychedelia());
         }
 
         public override void Deactivate()
         {
-            AuthorableModifiers.activePsychedelia = null;
+            AuthorableModifiersMod.activePsychedelia = null;
             base.Deactivate();
             GameplayModifiers.I.mPsychedeliaPhase = 0.000001f;     
         }

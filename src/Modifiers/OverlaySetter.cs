@@ -8,7 +8,7 @@ using UnityEngine;
 using System.Collections;
 using ScoreOverlay;
 
-namespace AudicaModding
+namespace AuthorableModifiers
 {
 
     public class OverlaySetter : Modifier

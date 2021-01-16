@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 using MelonLoader;
 using UnityEngine;
 using System.Collections;
-
-namespace AudicaModding
+using ArenaLoader;
+namespace AuthorableModifiers
 {
-
     public class Fader : Modifier
     {
-      
 
         public Fader(ModifierType _type, float _startTick, float _endTick, float _amount)
         {
@@ -25,7 +23,8 @@ namespace AudicaModding
         public override void Activate()
         {
             base.Activate();
-            if (amount > AuthorableModifiers.defaultArenaBrightness) amount = AuthorableModifiers.defaultArenaBrightness;
+
+            if (amount > AuthorableModifiersMod.defaultArenaBrightness) amount = AuthorableModifiersMod.defaultArenaBrightness;
             MelonCoroutines.Start(Fade());
 
         }
@@ -33,14 +32,16 @@ namespace AudicaModding
         private IEnumerator Fade()
         {
             float oldExposure = RenderSettings.skybox.GetFloat("_Exposure");
-            AudicaMod.currentSkyboxExposure = oldExposure;
+            ArenaLoaderMod.CurrentSkyboxExposure = oldExposure;
             float startTick = AudioDriver.I.mCachedTick;
             while (active)
             {
                 float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
                 float currentExp = Mathf.Lerp(oldExposure, amount, percentage / 100f);
                 RenderSettings.skybox.SetFloat("_Exposure", currentExp);
-                AudicaMod.currentSkyboxExposure = currentExp;
+                ArenaLoaderMod.CurrentSkyboxReflection = 0f;
+                ArenaLoaderMod.ChangeReflectionStrength(currentExp);
+                ArenaLoaderMod.CurrentSkyboxExposure = currentExp;
                 yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
                 
             }
@@ -49,8 +50,9 @@ namespace AudicaModding
 
         public override void Deactivate()
         {
-            RenderSettings.skybox.SetFloat("_Exposure", amount);
             base.Deactivate();
+            RenderSettings.skybox.SetFloat("_Exposure", amount);
+            RenderSettings.reflectionIntensity = amount;            
         }
     }
 }
