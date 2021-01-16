@@ -126,7 +126,9 @@ namespace AuthorableModifiers
             if (AutoLightshowMod.isEnabled)
             {
                 if(!enable) autoLightshowWasEnabled = true;
-                AutoLightshowMod.EnableMod(enable);
+                
+                if(!enable || (enable && autoLightshowWasEnabled))
+                    AutoLightshowMod.EnableMod(enable);
             }
         }
 
