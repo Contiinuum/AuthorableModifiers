@@ -26,8 +26,8 @@ namespace AuthorableModifiers
             MelonPrefs.RegisterBool(Category, nameof(enableFlashingLights), true, "Allows maps to use brightness changes and flashing lights. TURN THIS OFF IF YOU HAVE EPILEPSY!");
             MelonPrefs.RegisterBool(Category, nameof(enableArenaRotation), true, "Allows maps to rotate the arena. TURN THIS OFF IF YOU EASILY SUFFER FROM MOTION SICKNESS!");
             MelonPrefs.RegisterBool(Category, nameof(enablePsychedelia), true, "Allows maps to make use of Psychedelia.");
-            MelonPrefs.RegisterBool(Category, nameof(enableScoreDisablingModifiers), true, "Allows mods to use modifiers that disable posting your score to the leaderboards.");
-            MelonPrefs.RegisterBool(Category, nameof(hideWarning), true, "Hides the warning before starting a song.");
+            MelonPrefs.RegisterBool(Category, nameof(enableScoreDisablingModifiers), false, "Allows mods to use modifiers that disable posting your score to the leaderboards.");
+            MelonPrefs.RegisterBool(Category, nameof(hideWarning), false, "Hides the warning before starting a song.");
 
             MelonPrefs.RegisterString(Category, nameof(lightingTitle), "", lightingTitle);
             MelonPrefs.RegisterFloat(Category, nameof(intensity), 1f, "Controls how intense lighting modifiers are. [0.1, 1, 0.1, 1]{P}");
