@@ -33,11 +33,12 @@ namespace AuthorableModifiers
 
         private float maxBrightness;
         private float originalMaxBrightness;
-        private float fadeOutTime = 360f;
+        private float fadeOutTime = 240f;
         private float mapIntensity;
 
         private  int startIndex = 0;
         private static List<BrightnessEvent> brightnessEvents = new List<BrightnessEvent>();
+        private static List<PsyEvent> psyEvents = new List<PsyEvent>();
 
         public AutoLighting(ModifierType _type, float _startTick, float _endTick, float _maxBrightness, bool _pulseMode)
         {
@@ -65,10 +66,18 @@ namespace AuthorableModifiers
             if (!Integrations.arenaLoaderFound || !Config.enabled) return;
             StopLightshow();
             maxBrightness = AuthorableModifiersMod.defaultArenaBrightness * originalMaxBrightness;
-            mapIntensity = CalculateIntensity(SongCues.I.mCues.cues.First().tick, SongCues.I.mCues.cues.Last().tick, SongCues.I.mCues.cues.ToList());
+            
+            List<SongCues.Cue> cues = SongCues.I.mCues.cues.ToList();
+            float tick = AudioDriver.I.mCachedTick;
+            mapIntensity = CalculateIntensity(cues.First().tick, cues.Last().tick, cues.ToList());
+            for (int i = cues.Count - 1; i >= 0; i--)
+            {
+                if (cues[i].tick < tick) cues.RemoveAt(i);               
+                else if (cues[i].behavior == Target.TargetBehavior.Dodge) cues.RemoveAt(i);
+            }
+            
             active = true;
-                
-            Task.Run(() => PrepareLightshow());
+            Task.Run(() => PrepareLightshow(cues));
 
             if (pulseMode)
             {
@@ -133,26 +142,76 @@ namespace AuthorableModifiers
                 ArenaLoaderMod.CurrentSkyboxReflection = 0f;
                 ArenaLoaderMod.ChangeReflectionStrength(currentRef);
                 ArenaLoaderMod.CurrentSkyboxExposure = currentExp;
-                MelonLogger.Log(percentage.ToString());
             }
             await Task.CompletedTask;
         }
 
-        private async void PrepareLightshow()
+        private async void PrepareLightshow(List<SongCues.Cue> cues)
         {
             float oldExposure = RenderSettings.skybox.GetFloat("_Exposure");
             brightnessEvents.Clear();
+            psyEvents.Clear();
             ArenaLoaderMod.CurrentSkyboxExposure = oldExposure;
-            List<SongCues.Cue> cues = SongCues.I.mCues.cues.ToList();
-            for (int i = cues.Count - 1; i >= 0; i--)
+            if (!pulseMode)
             {
-                if (cues[i].behavior == Target.TargetBehavior.Dodge) cues.RemoveAt(i);
-                else if (!Config.enableFlashingLights && cues[i].behavior == Target.TargetBehavior.Chain) cues.RemoveAt(i);
+                //await PrepareFade(maxBrightness * .5f);
+                await PrepareAsync(cues);
+                //MelonCoroutines.Stop(faderToken);
             }
-            if (!pulseMode) await PrepareFade(maxBrightness * .5f);
-            await PrepareAsync(cues);          
-            MelonCoroutines.Stop(faderToken);
+            else
+            {
+                await PreparePulse(cues);
+            }
+            brightnessEvents.Sort((cue1, cue2) => cue1.startTick.CompareTo(cue2.startTick));
             lightshowToken = MelonCoroutines.Start(BetterLightshow());
+        }
+
+        private async Task PreparePulse(List<SongCues.Cue> cues)
+        {
+            foreach (SongCues.Cue cue in cues)
+            {
+                float amount = GetTargetAmount((Hitsound)cue.velocity, cue.behavior) * 2f;
+                //fadeToBlackStartTick = AudioDriver.I.mCachedTick;
+                //fadeToBlackEndTick = fadeToBlackStartTick + (fadeOutTime / mapIntensity);
+                float end = cue.tick + (fadeOutTime / mapIntensity);
+                //float curr = RenderSettings.skybox.GetFloat("_Exposure") + amount;
+                //float newAmount = curr > maxBrightness ? maxBrightness : curr;
+                //fadeToBlackExposure = newAmount;
+                //fadeToBlackReflection = newAmount;
+                brightnessEvents.Add(new BrightnessEvent(amount, cue.tick, end));
+                if(cue.nextCue != null)
+                {
+                    if (cue.tick != cue.nextCue.tick) PreparePsychedelia(cue);
+                }
+               
+            }
+            await Task.CompletedTask;
+        }
+
+        private void PreparePsychedelia(SongCues.Cue cue)
+        {
+            if (Config.enablePsychedelia)
+            {
+                if (cue.behavior == Target.TargetBehavior.Melee || cue.behavior == Target.TargetBehavior.ChainStart || cue.behavior == Target.TargetBehavior.Hold)
+                {
+                    List<float> ticks = new List<float>();
+                    if (cue.behavior == Target.TargetBehavior.ChainStart) LookForEndOfChain(cue, ticks);
+                    else LookForLastBehavior(cue, new Target.TargetBehavior[] { Target.TargetBehavior.Melee }, ticks);
+
+                    if (cue.behavior == Target.TargetBehavior.Hold && cue.tickLength >= 1920f)
+                    {
+                        //MelonCoroutines.Stop(psyToken);
+                        //psyToken = MelonCoroutines.Start(DoPsychedelia(AudioDriver.I.mCachedTick + cue.tickLength - 960f));
+                        psyEvents.Add(new PsyEvent(cue.tick, cue.tick + cue.tickLength - 960f));
+                    }
+                    else if (ticks[0] - cue.tick >= 1920f && cue.behavior == Target.TargetBehavior.Melee)
+                    {
+                        //MelonCoroutines.Stop(psyToken);
+                        //psyToken = MelonCoroutines.Start(DoPsychedelia(ticks[0] - 960f));
+                        psyEvents.Add(new PsyEvent(cue.tick, ticks[0] - 960f));
+                    }
+                }
+            }
         }
 
         private async Task PrepareAsync(List<SongCues.Cue> cues)
@@ -177,7 +236,7 @@ namespace AuthorableModifiers
             sections.Sort((section1, section2) => section1.start.CompareTo(section2.start));
             foreach (Section section in sections)
             {
-               
+                float sectionBrightnessSum = 0f;
                 List<SongCues.Cue> sectionCues = new List<SongCues.Cue>();
 
                 float sectionBrightness = 0f;
@@ -194,18 +253,44 @@ namespace AuthorableModifiers
                 if (sectionBrightness != 0f && sectionCues.Count > 0f)
                 {
                     sectionCues.Sort((cue1, cue2) => cue1.tick.CompareTo(cue2.tick));
-
                     foreach (SongCues.Cue cue in sectionCues)
                     {
                         if (cue.nextCue is null) break;
-                        brightnessEvents.Add(new BrightnessEvent(((GetTargetAmount((Hitsound)cue.velocity, cue.behavior) / sectionBrightness) * (sectionTargetBrightness - previousSectionBrightness)), cue.tick, cue.nextCue.tick, section.intensity));
+                        sectionBrightnessSum += ((GetTargetAmount((Hitsound)cue.velocity, cue.behavior) / sectionBrightness) * (sectionTargetBrightness - previousSectionBrightness));
+                        float brightness = previousSectionBrightness + sectionBrightnessSum;
+                        float end = cue.tick + 240f;
+                        if (brightnessEvents.Count > 0)
+                        {
+                            if (brightnessEvents.Last().startTick != cue.tick)
+                            {
+                                brightnessEvents.Add(new BrightnessEvent(brightness, cue.tick, cue.nextCue.tick));
+                                PreparePsychedelia(cue);
+                            }
+                            else
+                            {
+                                BrightnessEvent be = brightnessEvents.Last();
+                                be.brightness = brightness;
+                                if (cue.nextCue.tick > be.endTick)
+                                {
+                                    be.endTick = end;
+                                }
+                                brightnessEvents.RemoveAt(brightnessEvents.Count - 1);
+                                brightnessEvents.Add(be);
+                            }
+                        }
+                        else
+                        {
+                            brightnessEvents.Add(new BrightnessEvent(brightness, cue.tick, cue.nextCue.tick));
+                            PreparePsychedelia(cue);
+                        }
+
                     }
                     expState = expState == ExposureState.Light ? ExposureState.Dark : ExposureState.Light;
+                    previousSectionBrightness = sectionTargetBrightness;
                 }
-                previousSectionBrightness = sectionTargetBrightness;
+
             }
             brightnessEvents.Sort((event1, event2) => event1.startTick.CompareTo(event2.startTick));
-            for (int i = brightnessEvents.Count - 1; i >= 0; i--) if (brightnessEvents[i].endTick < AudioDriver.I.mCachedTick) brightnessEvents.RemoveAt(i);
             await Task.CompletedTask;
         }
 
@@ -244,16 +329,26 @@ namespace AuthorableModifiers
         private IEnumerator BetterLightshow()
         {
 
-            List<SongCues.Cue> cues = SongCues.I.mCues.cues.ToList();
+            //List<SongCues.Cue> cues = SongCues.I.mCues.cues.ToList();
             while (active)
             {
+                if (psyEvents.Count > 0)
+                {
+                    if (psyEvents[0].startTick <= AudioDriver.I.mCachedTick)
+                    {
+                        MelonCoroutines.Stop(psyToken);
+                        psyToken = MelonCoroutines.Start(DoPsychedelia(psyEvents[0].startTick, psyEvents[0].endTick));
+                        psyEvents.RemoveAt(0);
+                    }
+                }
+
                 if (brightnessEvents.Count == 0) yield break;
                 if (brightnessEvents[0].startTick <= AudioDriver.I.mCachedTick)
                 {
                     if (!pulseMode)
                     {
                         MelonCoroutines.Stop(faderToken);
-                        faderToken = MelonCoroutines.Start(BetterFade(brightnessEvents[0].endTick, brightnessEvents[0].brightness));
+                        faderToken = MelonCoroutines.Start(BetterFade(brightnessEvents[0].startTick, brightnessEvents[0].endTick, brightnessEvents[0].brightness));
                     }
                     else
                     {
@@ -266,70 +361,23 @@ namespace AuthorableModifiers
                     }
                     brightnessEvents.RemoveAt(0);
                 }
-
-                if (cues.Count == 0) yield break;
-                SongCues.Cue cue = cues[0];
-                if (cue.nextCue is null) yield break;
-                if (cue.tick <= AudioDriver.I.mCachedTick)
-                {
-                    HandlePsychedelia(cue);
-                    if (pulseMode) HandlePulse(cue);
-                    cues.RemoveAt(0);
-                }
-
-                yield return new WaitForSecondsRealtime(.01f);
+                yield return new WaitForSecondsRealtime(.02f);
             }
-        }
-
-        private void HandlePsychedelia(SongCues.Cue cue)
-        {
-            if (Config.enablePsychedelia)
-            {
-                if (cue.behavior == Target.TargetBehavior.Melee || cue.behavior == Target.TargetBehavior.ChainStart || cue.behavior == Target.TargetBehavior.Hold)
-                {
-
-                    List<float> ticks = new List<float>();
-                    if (cue.behavior == Target.TargetBehavior.ChainStart) LookForEndOfChain(cue, ticks);
-                    else LookForLastBehavior(cue, new Target.TargetBehavior[] { Target.TargetBehavior.Melee }, ticks);
-
-                    if (cue.behavior == Target.TargetBehavior.Hold && cue.tickLength >= 1920f)
-                    {
-                        MelonCoroutines.Stop(psyToken);
-                        psyToken = MelonCoroutines.Start(DoPsychedelia(AudioDriver.I.mCachedTick + cue.tickLength - 960f));
-                    }
-                    else if (ticks[0] - cue.tick >= 1920f && cue.behavior == Target.TargetBehavior.Melee)
-                    {
-                        MelonCoroutines.Stop(psyToken);
-                        psyToken = MelonCoroutines.Start(DoPsychedelia(ticks[0] - 960f));
-                    }
-                }
-            }
-        }
-
-        private void HandlePulse(SongCues.Cue cue)
-        {
-            float amount = GetTargetAmount((Hitsound)cue.velocity, cue.behavior) * 2f;
-            fadeToBlackStartTick = AudioDriver.I.mCachedTick;
-            fadeToBlackEndTick = fadeToBlackStartTick + (fadeOutTime / mapIntensity);
-            float curr = RenderSettings.skybox.GetFloat("_Exposure") + amount;
-            float newAmount = curr > maxBrightness ? maxBrightness : curr;
-            fadeToBlackExposure = newAmount;
-            fadeToBlackReflection = newAmount;
         }
 
         private float GetTargetAmount(Hitsound hitsound, Target.TargetBehavior behavior)
         {
-            float amount = 0f;
+            float amount = 0.1f;
             switch (hitsound)
             {
                 case Hitsound.ChainNode:
                     amount = (maxBrightness / 100f) * 5f;
                     break;
                 case Hitsound.ChainStart:
-                    amount = (maxBrightness / 100f) * 20f;
+                    amount = (maxBrightness / 100f) * 15f;
                     break;
                 case Hitsound.Kick:
-                    amount = (maxBrightness / 100f) * 30f;
+                    amount = (maxBrightness / 100f) * 25f;
                     break;
                 case Hitsound.Snare:
                     amount = (maxBrightness / 100f) * 40f;
@@ -386,43 +434,27 @@ namespace AuthorableModifiers
             ticks.Add(cue.nextCue.tick);
         }
 
-        private IEnumerator Fade(float endTick, float targetExposure)
+        private IEnumerator BetterFade(float startTick, float endTick, float targetExposure)
         {
-            float oldExposure = RenderSettings.skybox.GetFloat("_Exposure");
-            float oldReflection = RenderSettings.reflectionIntensity;
-            ArenaLoaderMod.CurrentSkyboxExposure = oldExposure;
-            float startTick = AudioDriver.I.mCachedTick;
-            while (true)
-            {
-                float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
-                float currentExp = Mathf.Lerp(oldExposure, targetExposure, percentage / 100f);
-                float currentRef = Mathf.Lerp(oldReflection, targetExposure, percentage / 100f);
-                RenderSettings.skybox.SetFloat("_Exposure", currentExp);
-                ArenaLoaderMod.CurrentSkyboxReflection = 0f;
-                ArenaLoaderMod.ChangeReflectionStrength(currentRef);
-                ArenaLoaderMod.CurrentSkyboxExposure = currentExp;
-                yield return new WaitForSecondsRealtime(.01f);
-            }
-        }
 
-        private IEnumerator BetterFade(float endTick, float targetExposure)
-        {
             float oldExposure = RenderSettings.skybox.GetFloat("_Exposure");
             float oldReflection = RenderSettings.reflectionIntensity;
             ArenaLoaderMod.CurrentSkyboxExposure = oldExposure;
-            float startTick = AudioDriver.I.mCachedTick;
-            targetExposure += oldExposure;
-            while (true)
+            //float startTick = AudioDriver.I.mCachedTick;
+            //targetExposure += oldExposure;
+            float percentage = 0f;
+            while (percentage < 100f)
             {
-                float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
+                percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
                 float currentExp = Mathf.Lerp(oldExposure, targetExposure, percentage / 100f);
                 float currentRef = Mathf.Lerp(oldReflection, targetExposure, percentage / 100f);
                 RenderSettings.skybox.SetFloat("_Exposure", currentExp);
                 ArenaLoaderMod.CurrentSkyboxReflection = 0f;
                 ArenaLoaderMod.ChangeReflectionStrength(currentRef);
                 ArenaLoaderMod.CurrentSkyboxExposure = currentExp;
-                yield return new WaitForSecondsRealtime(.01f);
+                yield return new WaitForSecondsRealtime(.02f);
             }
+
         }
 
         private IEnumerator FadeToBlack()
@@ -444,13 +476,12 @@ namespace AuthorableModifiers
             }
         }
 
-        private IEnumerator DoPsychedelia(float end)
+        private IEnumerator DoPsychedelia(float start, float end)
         {
             psychadeliaTimer = lastPsyTimer;
             while (active)
             {
-                float tick = AudioDriver.I.mCachedTick;
-                float amount = SongDataHolder.I.songData.GetTempo(tick) / 50f;
+                float amount = SongDataHolder.I.songData.GetTempo(start) / 50f;
                 float phaseTime = defaultPsychadeliaPhaseSeconds / amount;
 
                 if (psychadeliaTimer <= phaseTime)
@@ -465,14 +496,14 @@ namespace AuthorableModifiers
                 {
                     psychadeliaTimer = 0;
                 }
-                if (tick > end)
+                if (AudioDriver.I.mCachedTick > end)
                 {
                     lastPsyTimer = psychadeliaTimer;
                     psychadeliaTimer = 0;
                     yield break;
                 }
 
-                yield return new WaitForSecondsRealtime(0.01f);
+                yield return new WaitForSecondsRealtime(0.02f);
             }
         }
 
@@ -489,7 +520,7 @@ namespace AuthorableModifiers
             Melee = 3,
             Kick = 20,
             Percussion = 60,
-            Snare = 120
+            Snare = 127
         }
 
         public struct BrightnessEvent
@@ -497,14 +528,24 @@ namespace AuthorableModifiers
             public float brightness;
             public float startTick;
             public float endTick;
-            public float intensity;
 
-            public BrightnessEvent(float _brightness, float _startTick, float _endTick, float _intensity)
+            public BrightnessEvent(float _brightness, float _startTick, float _endTick)
             {
                 brightness = _brightness;
                 startTick = _startTick;
                 endTick = _endTick;
-                intensity = _intensity;
+            }
+        }
+
+        public struct PsyEvent
+        {
+            public float startTick;
+            public float endTick;
+
+            public PsyEvent(float _startTick, float _endTick)
+            {
+                startTick = _startTick;
+                endTick = _endTick;
             }
         }
 

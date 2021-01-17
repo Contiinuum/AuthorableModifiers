@@ -56,7 +56,7 @@ namespace AuthorableModifiers
                         songCues[i].zOffset = zOffset;
                     }
                     songCues[i].zOffset += AuthorableModifiersMod.oldOffsetDict[songCues[i].tick + (int)songCues[i].handType];
-                    if(currentCount < transitionNumberOfTargets) currentCount++;
+                    if (currentCount < transitionNumberOfTargets) currentCount++;
                 }
             }
         }

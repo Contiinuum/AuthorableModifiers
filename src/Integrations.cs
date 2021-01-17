@@ -59,7 +59,6 @@ namespace AuthorableModifiers
                     {
                         autoLightshowFound = true;
                         MelonLogger.Log("Auto Lightshow found");
-
                     }
                     else
                     {

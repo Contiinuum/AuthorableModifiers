@@ -38,13 +38,13 @@ namespace AuthorableModifiers
         public static float userArenaRotation = 0f;
 
         public static DebugTextPopup popupText = null;
-        private static bool autoLightshowWasEnabled = false;
+        public static bool lightshowWasEnabled = false;
         public static class BuildInfo
         {
             public const string Name = "AuthorableModifiers";  // Name of the Mod.  (MUST BE SET)
             public const string Author = "Continuum"; // Author of the Mod.  (Set as null if none)
             public const string Company = null; // Company that made the Mod.  (Set as null if none)
-            public const string Version = "1.1.6"; // Version of the Mod.  (MUST BE SET)
+            public const string Version = "1.2.0"; // Version of the Mod.  (MUST BE SET)
             public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
         }
 
@@ -76,6 +76,7 @@ namespace AuthorableModifiers
         {
             if (!Config.enabled) return;
             SetOldOffsets();
+            zOffsetList.Sort((z1, z2) => z1.startTick.CompareTo(z2.startTick));
             foreach(Modifier m in zOffsetList)
             {
                 m.Activate();
@@ -106,7 +107,7 @@ namespace AuthorableModifiers
             }
             foreach (Modifier m in preloadModifiers)
             {
-                m.Activate();                
+                 m.Activate();                                         
             }
             foreach(Modifier m in awaitEnableModifiers)
             {
@@ -123,11 +124,14 @@ namespace AuthorableModifiers
 
         private static void EnableAutoLightshow(bool enable)
         {
-            if (AutoLightshowMod.isEnabled)
+            if (Integrations.autoLightshowFound)
             {
-                if(!enable) autoLightshowWasEnabled = true;
+                if (AutoLightshowMod.isEnabled)
+                {
+                    if (!enable) lightshowWasEnabled = true;
+                }
                 
-                if(!enable || (enable && autoLightshowWasEnabled))
+                if(!enable || (enable && lightshowWasEnabled))
                     AutoLightshowMod.EnableMod(enable);
             }
         }
@@ -201,6 +205,7 @@ namespace AuthorableModifiers
             zOffsetList.Clear();
             oldOffsetDict.Clear();
             EnableAutoLightshow(true);
+            lightshowWasEnabled = false;
         }
 
         public static void SetOldOffsets()
