@@ -44,7 +44,7 @@ namespace AuthorableModifiers
             public const string Name = "AuthorableModifiers";  // Name of the Mod.  (MUST BE SET)
             public const string Author = "Continuum"; // Author of the Mod.  (Set as null if none)
             public const string Company = null; // Company that made the Mod.  (Set as null if none)
-            public const string Version = "1.2.1"; // Version of the Mod.  (MUST BE SET)
+            public const string Version = "1.2.2"; // Version of the Mod.  (MUST BE SET)
             public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
         }
 
@@ -193,12 +193,12 @@ namespace AuthorableModifiers
             LoadModifierCues(true);
         }
 
-        public static void Reset()
+        public static void Reset(bool fromBack = false)
         {
             if (!Config.enabled) return;
             if (!modifiersFound) return;
             modifiersFound = false;
-            ResetValues();
+            ResetValues(fromBack);
             DestroyPopup();
             oldColorsSet = false;
             oldArenaSet = false;
@@ -221,12 +221,16 @@ namespace AuthorableModifiers
             }
         }
 
-        private static void ResetValues()
+        private static void ResetValues(bool fromBack = false)
         {
-            foreach (Modifier mod in awaitDisableModifiers) mod.Deactivate();
-            foreach (Modifier mod in preloadModifiers) mod.Deactivate();
-            foreach (Modifier mod in singleUseModifiers) mod.Deactivate();
-            foreach (ModifierQueueItem item in modifierQueue) item.modifier.Deactivate();
+            //foreach (Modifier mod in awaitDisableModifiers) mod.Deactivate();
+            // foreach (Modifier mod in preloadModifiers) mod.Deactivate();
+            //foreach (Modifier mod in singleUseModifiers) mod.Deactivate();
+            if (!fromBack)
+            {
+                foreach (ModifierQueueItem item in modifierQueue) item.modifier.Deactivate();
+            }
+            
             modifierQueue.Clear();
             awaitDisableModifiers.Clear();
             awaitEnableModifiers.Clear();
@@ -234,7 +238,11 @@ namespace AuthorableModifiers
             singleUseModifiers.Clear();
             activePsychedelia = null;
             activeColorChange = null;
-            if (oldColorsSet) new ColorChange(ModifierType.ColorChange, 0, 0, new float[] { 0f, 0f, 0f}, new float[] { 0f, 0f, 0f}).UpdateColors(oldLeftHandColor, oldRightHandColor);
+            if (oldColorsSet)
+            {
+                new ColorChange(ModifierType.ColorChange, 0, 0, new float[] { 0f, 0f, 0f }, new float[] { 0f, 0f, 0f }).UpdateColors(oldLeftHandColor, oldRightHandColor);
+            }
+                
             if (Integrations.arenaLoaderFound)
             {
                 /*RenderSettings.skybox.SetFloat("_Exposure", userArenaBrightness);

@@ -75,7 +75,7 @@ namespace AuthorableModifiers
             private static void Postfix(LaunchPanel __instance)
             {
                 //Set filePath
-                AuthorableModifiersMod.Reset();
+                AuthorableModifiersMod.Reset(true);
                 //MelonLoader.MelonLogger.Log(__result.zipPath);
             }
         }
