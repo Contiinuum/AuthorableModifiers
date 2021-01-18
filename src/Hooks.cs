@@ -157,10 +157,8 @@ namespace AuthorableModifiers
             private static void Postfix(EnvironmentLoader __instance)
             {
                 if (!Config.enabled) return;
-                if(MenuState.sState == MenuState.State.SettingsPage)
-                {
-                    MelonLoader.MelonCoroutines.Start(AuthorableModifiersMod.ISetDefaultArenaBrightness());
-                }
+                 MelonLoader.MelonCoroutines.Start(AuthorableModifiersMod.ISetDefaultArenaBrightness());
+                
                    
             }
         }

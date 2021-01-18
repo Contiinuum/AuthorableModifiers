@@ -356,8 +356,10 @@ namespace AuthorableModifiers
                         fadeToBlackEndTick = fadeToBlackStartTick + (fadeOutTime / mapIntensity);
                         float curr = RenderSettings.skybox.GetFloat("_Exposure") + brightnessEvents[0].brightness;
                         float newAmount = curr > maxBrightness ? maxBrightness : curr;
+                        float newReflection = newAmount / maxBrightness;
+                        newReflection = .5f + (newAmount * newReflection);
                         fadeToBlackExposure = newAmount;
-                        fadeToBlackReflection = newAmount;
+                        fadeToBlackReflection = newReflection;
                     }
                     brightnessEvents.RemoveAt(0);
                 }
@@ -439,6 +441,8 @@ namespace AuthorableModifiers
 
             float oldExposure = RenderSettings.skybox.GetFloat("_Exposure");
             float oldReflection = RenderSettings.reflectionIntensity;
+            float targetReflection = targetExposure / maxBrightness;
+            targetReflection = .5f + (targetExposure * targetReflection);
             ArenaLoaderMod.CurrentSkyboxExposure = oldExposure;
             //float startTick = AudioDriver.I.mCachedTick;
             //targetExposure += oldExposure;
@@ -447,7 +451,7 @@ namespace AuthorableModifiers
             {
                 percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
                 float currentExp = Mathf.Lerp(oldExposure, targetExposure, percentage / 100f);
-                float currentRef = Mathf.Lerp(oldReflection, targetExposure, percentage / 100f);
+                float currentRef = Mathf.Lerp(oldReflection, targetReflection, percentage / 100f);
                 RenderSettings.skybox.SetFloat("_Exposure", currentExp);
                 ArenaLoaderMod.CurrentSkyboxReflection = 0f;
                 ArenaLoaderMod.ChangeReflectionStrength(currentRef);
@@ -466,7 +470,7 @@ namespace AuthorableModifiers
                 if (percentage >= 0)
                 {
                     float currentExp = Mathf.Lerp(fadeToBlackExposure, 0f, percentage / 100f);
-                    float currentRef = Mathf.Lerp(fadeToBlackReflection, 0f, percentage / 100f);
+                    float currentRef = Mathf.Lerp(fadeToBlackReflection, .5f, percentage / 100f);
                     RenderSettings.skybox.SetFloat("_Exposure", currentExp);
                     ArenaLoaderMod.CurrentSkyboxReflection = 0f;
                     ArenaLoaderMod.ChangeReflectionStrength(currentRef);

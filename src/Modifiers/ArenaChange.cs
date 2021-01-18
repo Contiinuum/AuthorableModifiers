@@ -30,22 +30,26 @@ namespace AuthorableModifiers
         {
             base.Activate();           
             oldArena = PlayerPreferences.I.Environment.Get();
-            AuthorableModifiersMod.SetOldArena(oldArena);
             foreach (string option in options)
             {
                 if (ChangeArena(option))
                 {
+                    
                     MelonCoroutines.Start(AuthorableModifiersMod.ISetDefaultArenaBrightness());
                     break;
                 }
                    
-            }              
+            }
+            AuthorableModifiersMod.SetOldArena(oldArena);
+            RenderSettings.skybox.SetFloat("_Exposure", AuthorableModifiersMod.defaultArenaBrightness);
+            RenderSettings.reflectionIntensity = AuthorableModifiersMod.defaultArenaReflection;
         }
 
         private bool ChangeArena(string option)
         {
             if (ArenaExists(option))
             {
+                if (oldArena == option) return false;
                 PlayerPreferences.I.Environment.Set(option);
 
                 EnvironmentLoader.I.SwitchEnvironment();

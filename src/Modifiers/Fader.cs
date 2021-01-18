@@ -32,16 +32,20 @@ namespace AuthorableModifiers
         private IEnumerator Fade()
         {
             float oldExposure = RenderSettings.skybox.GetFloat("_Exposure");
+            float oldReflection = RenderSettings.reflectionIntensity;
             ArenaLoaderMod.CurrentSkyboxExposure = oldExposure;
             float startTick = AudioDriver.I.mCachedTick;
             while (active)
             {
                 float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
                 float currentExp = Mathf.Lerp(oldExposure, amount, percentage / 100f);
+                float targetReflection = amount / AuthorableModifiersMod.defaultArenaBrightness;
+                targetReflection = .5f + (amount * targetReflection);
+                float currentReflection = Mathf.Lerp(oldReflection, targetReflection, percentage / 100f);
                 RenderSettings.skybox.SetFloat("_Exposure", currentExp);
                 ArenaLoaderMod.CurrentSkyboxReflection = 0f;
-                ArenaLoaderMod.ChangeReflectionStrength(currentExp);
-                ArenaLoaderMod.CurrentSkyboxExposure = currentExp;
+                ArenaLoaderMod.ChangeReflectionStrength(currentReflection);
+                ArenaLoaderMod.CurrentSkyboxExposure = currentReflection;
                 yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
                 
             }

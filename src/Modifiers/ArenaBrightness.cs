@@ -46,6 +46,10 @@ namespace AuthorableModifiers
                 newExposure *= amount;
                 //if (amount < minBrightness) amount = minBrightness;
                 ArenaLoaderMod.ChangeExposure(newExposure);
+                ArenaLoaderMod.CurrentSkyboxReflection = 0f;
+                float newReflection = newExposure / AuthorableModifiersMod.defaultArenaBrightness;
+                newReflection = .5f + (newExposure * newReflection);
+                ArenaLoaderMod.ChangeReflectionStrength(newReflection);
             }
 
         }
