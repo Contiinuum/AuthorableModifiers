@@ -170,6 +170,7 @@ namespace AuthorableModifiers
         {
             foreach (SongCues.Cue cue in cues)
             {
+                if (cue.behavior == Target.TargetBehavior.Dodge) continue;
                 float amount = GetTargetAmount((Hitsound)cue.velocity, cue.behavior) * 2f;
                 //fadeToBlackStartTick = AudioDriver.I.mCachedTick;
                 //fadeToBlackEndTick = fadeToBlackStartTick + (fadeOutTime / mapIntensity);
@@ -181,7 +182,8 @@ namespace AuthorableModifiers
                 brightnessEvents.Add(new BrightnessEvent(amount, cue.tick, end));
                 if(cue.nextCue != null)
                 {
-                    if (cue.tick != cue.nextCue.tick) PreparePsychedelia(cue);
+                    if(psyEvents.Count == 0) PreparePsychedelia(cue);
+                    else if (psyEvents.Last().startTick != cue.tick) PreparePsychedelia(cue);
                 }
                
             }
@@ -256,6 +258,7 @@ namespace AuthorableModifiers
                     foreach (SongCues.Cue cue in sectionCues)
                     {
                         if (cue.nextCue is null) break;
+                        if (cue.behavior == Target.TargetBehavior.Dodge) continue;
                         sectionBrightnessSum += ((GetTargetAmount((Hitsound)cue.velocity, cue.behavior) / sectionBrightness) * (sectionTargetBrightness - previousSectionBrightness));
                         float brightness = previousSectionBrightness + sectionBrightnessSum;
                         float end = cue.tick + 240f;
@@ -270,7 +273,7 @@ namespace AuthorableModifiers
                             {
                                 BrightnessEvent be = brightnessEvents.Last();
                                 be.brightness = brightness;
-                                if (cue.nextCue.tick > be.endTick)
+                                if (cue.nextCue.tick > be.endTick && cue.nextCue.behavior != Target.TargetBehavior.Dodge)
                                 {
                                     be.endTick = end;
                                 }

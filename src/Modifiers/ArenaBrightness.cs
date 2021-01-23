@@ -68,7 +68,10 @@ namespace AuthorableModifiers
                     float amnt = AuthorableModifiersMod.defaultArenaBrightness * dir;
                     if (dir == 1) amnt *= Config.intensity;
                     ArenaLoaderMod.ChangeExposure(amnt);
-                    ArenaLoaderMod.ChangeReflectionStrength(amnt);
+
+                    float newReflection = amnt / AuthorableModifiersMod.defaultArenaBrightness;
+                    newReflection = .5f + (amnt * newReflection);
+                    ArenaLoaderMod.ChangeReflectionStrength(newReflection);
                     if (dir == 1) dir = 0;
                     else if (dir == 0) dir = 1;
                     nextStrobe += interval;

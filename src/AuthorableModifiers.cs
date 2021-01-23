@@ -103,7 +103,7 @@ namespace AuthorableModifiers
             }
             if (Integrations.autoLightshowFound)
             {
-                EnableAutoLightshow(false);           
+                EnableAutoLightshow(false);
             }
             foreach (Modifier m in preloadModifiers)
             {
@@ -204,7 +204,7 @@ namespace AuthorableModifiers
             oldArenaSet = false;
             zOffsetList.Clear();
             oldOffsetDict.Clear();
-            EnableAutoLightshow(true);
+            if(Integrations.autoLightshowFound) EnableAutoLightshow(true);
             lightshowWasEnabled = false;
         }
 
@@ -223,11 +223,11 @@ namespace AuthorableModifiers
 
         private static void ResetValues(bool fromBack = false)
         {
-            //foreach (Modifier mod in awaitDisableModifiers) mod.Deactivate();
-            // foreach (Modifier mod in preloadModifiers) mod.Deactivate();
-            //foreach (Modifier mod in singleUseModifiers) mod.Deactivate();
             if (!fromBack)
             {
+                foreach (Modifier mod in awaitDisableModifiers) mod.Deactivate();
+                foreach (Modifier mod in preloadModifiers) mod.Deactivate();
+                foreach (Modifier mod in singleUseModifiers) mod.Deactivate();          
                 foreach (ModifierQueueItem item in modifierQueue) item.modifier.Deactivate();
             }
             
@@ -245,12 +245,6 @@ namespace AuthorableModifiers
                 
             if (Integrations.arenaLoaderFound)
             {
-                /*RenderSettings.skybox.SetFloat("_Exposure", userArenaBrightness);
-                RenderSettings.skybox.SetFloat("_Rotation", userArenaRotation);
-                ArenaLoaderMod.CurrentSkyboxExposure = userArenaBrightness;
-                ArenaLoaderMod.currentSkyboxRotation = userArenaRotation;
-                ArenaLoaderMod.CurrentSkyboxReflection = userArenaReflection;
-                */
                 if (oldArena.Length > 0 && oldArenaSet)
                 {
                     if(oldArena != PlayerPreferences.I.Environment.Get())

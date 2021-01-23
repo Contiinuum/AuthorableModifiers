@@ -25,7 +25,7 @@ namespace AuthorableModifiers
                         if (entry.Name == "modifiers.json")
                         {
                             modifierCuesFound = true;
-                            MelonLogger.Log("Loading Modifiers...");
+                            //MelonLogger.Log("Loading Modifiers...");
                             break;
                         }
                     }

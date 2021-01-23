@@ -41,8 +41,8 @@ namespace AuthorableModifiers
                    
             }
             AuthorableModifiersMod.SetOldArena(oldArena);
-            RenderSettings.skybox.SetFloat("_Exposure", AuthorableModifiersMod.defaultArenaBrightness);
-            RenderSettings.reflectionIntensity = AuthorableModifiersMod.defaultArenaReflection;
+            //RenderSettings.skybox.SetFloat("_Exposure", AuthorableModifiersMod.defaultArenaBrightness);
+            //RenderSettings.reflectionIntensity = AuthorableModifiersMod.defaultArenaReflection;
         }
 
         private bool ChangeArena(string option)
