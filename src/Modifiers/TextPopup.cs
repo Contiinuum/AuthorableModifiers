@@ -14,7 +14,7 @@ namespace AuthorableModifiers
         private float size;
         private bool glow;
         private Vector3 modifierTextPosition = new Vector3(0f, 4f, 25f);
-        public TextPopup(ModifierType _type, float _startTick, float _endTick, string _text, float _size, bool _glow)
+        public TextPopup(ModifierType _type = ModifierType.TextPopup, float _startTick = 0, float _endTick = 0, string _text = "", float _size = 12, float _xoff = 0, float _yoff = 0, float _zoff = 0, bool _glow = false)
         {
             type = _type;
             startTick = _startTick;
@@ -22,6 +22,10 @@ namespace AuthorableModifiers
             text = _text;
             size = _size;
             glow = _glow;
+
+            modifierTextPosition.x += _xoff;
+            modifierTextPosition.y += _yoff;
+            modifierTextPosition.z += _zoff;
         }
 
         public override void Activate()
