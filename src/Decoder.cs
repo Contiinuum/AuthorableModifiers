@@ -219,9 +219,9 @@ namespace AuthorableModifiers
                                             modifiersJSON["modifiers"][i]["endTick"],
                                             modifiersJSON["modifiers"][i]["value1"], //text
                                             modifiersJSON["modifiers"][i]["value2"], //size
-                                            modifiersJSON["modifiers"][i]["value3"], // x offset
-                                            modifiersJSON["modifiers"][i]["value4"], // y offset
-                                            modifiersJSON["modifiers"][i]["value5"], // z offset
+                                            modifiersJSON["modifiers"][i]["xoffset"], // x offset
+                                            modifiersJSON["modifiers"][i]["yoffset"], // y offset
+                                            modifiersJSON["modifiers"][i]["zoffset"], // z offset
                                             modifiersJSON["modifiers"][i]["option1"]);
                                         break;
                                     case ModifierType.AutoLighting:
