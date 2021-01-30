@@ -31,14 +31,14 @@ namespace AuthorableModifiers
         public override void Activate()
         {
             base.Activate();
-            AuthorableModifiersMod.DebugTextPopup(text, size, modifierTextPosition, glow);
+            AuthorableModifiersMod.DebugTextPopup(text, size, modifierTextPosition, glow, startTick);
             
         }
 
         public override void Deactivate()
         {
             base.Deactivate();
-            AuthorableModifiersMod.DestroyPopup();            
+            AuthorableModifiersMod.DestroyPopup(startTick);            
         }
 
 

@@ -37,7 +37,7 @@ namespace AuthorableModifiers
         public static float userArenaReflection = 1f;
         public static float userArenaRotation = 0f;
 
-        public static DebugTextPopup popupText = null;
+        public static Dictionary<float, DebugTextPopup> popupTextDictionary = new Dictionary<float, DebugTextPopup>();
         public static bool lightshowWasEnabled = false;
         public static class BuildInfo
         {
@@ -149,24 +149,38 @@ namespace AuthorableModifiers
             {
                 yield return new WaitForSecondsRealtime(.2f);
             }
-            DebugWarningPopup(text, speed);
+            DebugWarningPopup(text, speed, -1);
         }
 
-        public static void DebugWarningPopup(string text, float speed)
+        public static void DebugWarningPopup(string text, float speed, int tick)
         {
-            popupText = KataConfig.I.CreateDebugText(text, debugTextPosition, 4f, null, false, speed);
+            popupTextDictionary.Add(tick, KataConfig.I.CreateDebugText(text, debugTextPosition, 4f, null, false, speed));
         }
 
-        public static void DebugTextPopup(string text, float size, Vector3 position, bool glow)
+        public static void DebugTextPopup(string text, float size, Vector3 position, bool glow, float tick)
         {
-            popupText = KataConfig.I.CreateDebugText(text, position, size, null, glow, .001f);
+            popupTextDictionary.Add(tick, KataConfig.I.CreateDebugText(text, position, size, null, glow, .001f));
         }
 
-        public static void DestroyPopup()
+        public static void DestroyPopup(float tick, bool destroyAll = false)
         {
-            if(popupText != null)
+            if (destroyAll)
             {
-                GameObject.Destroy(popupText.transform.root.gameObject);
+                foreach(KeyValuePair<float, DebugTextPopup> entry in popupTextDictionary)
+                {
+                    GameObject.Destroy(entry.Value.gameObject);
+                }
+                popupTextDictionary.Clear();
+                return;
+            }
+            if(popupTextDictionary != null)
+            {
+                if (popupTextDictionary.ContainsKey(tick))
+                {
+                    GameObject.Destroy(popupTextDictionary[tick].gameObject);
+                    popupTextDictionary.Remove(tick);
+                }
+                   
             }
         }
 
@@ -199,7 +213,7 @@ namespace AuthorableModifiers
             if (!modifiersFound) return;
             modifiersFound = false;
             ResetValues(fromBack);
-            DestroyPopup();
+            DestroyPopup(0, true);
             oldColorsSet = false;
             oldArenaSet = false;
             zOffsetList.Clear();
