@@ -217,8 +217,11 @@ namespace AuthorableModifiers
                                         modifierCue = new TextPopup(type,
                                             modifiersJSON["modifiers"][i]["startTick"],
                                             modifiersJSON["modifiers"][i]["endTick"],
-                                            modifiersJSON["modifiers"][i]["value1"],
-                                            modifiersJSON["modifiers"][i]["value2"],
+                                            modifiersJSON["modifiers"][i]["value1"], //text
+                                            modifiersJSON["modifiers"][i]["value2"], //size
+                                            modifiersJSON["modifiers"][i]["xoffset"], // x offset
+                                            modifiersJSON["modifiers"][i]["yoffset"], // y offset
+                                            modifiersJSON["modifiers"][i]["zoffset"], // z offset
                                             modifiersJSON["modifiers"][i]["option1"]);
                                         break;
                                     case ModifierType.AutoLighting:
