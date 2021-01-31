@@ -157,9 +157,14 @@ namespace AuthorableModifiers
             popupTextDictionary.Add(tick, KataConfig.I.CreateDebugText(text, debugTextPosition, 4f, null, false, speed));
         }
 
-        public static void DebugTextPopup(string text, float size, Vector3 position, bool glow, float tick)
+        public static void DebugTextPopup(string text, float size, Vector3 position, bool glow, bool faceForward, float tick)
         {
-            popupTextDictionary.Add(tick, KataConfig.I.CreateDebugText(text, position, size, null, glow, .001f));
+            DebugTextPopup textpopup = KataConfig.I.CreateDebugText(text, position, size, null, glow, .001f);
+
+            if(faceForward)
+                textpopup.transform.forward = Vector3.forward;
+
+            popupTextDictionary.Add(tick, textpopup);
         }
 
         public static void DestroyPopup(float tick, bool destroyAll = false)
