@@ -16,6 +16,7 @@ namespace AuthorableModifiers
         public static List<Modifier> awaitDisableModifiers = new List<Modifier>();
         public static List<Modifier> preloadModifiers = new List<Modifier>();
         public static List<Modifier> zOffsetList = new List<Modifier>();
+        public static List<AutoLighting> autoLightings = new List<AutoLighting>();
         public static List<ModifierQueueItem> modifierQueue = new List<ModifierQueueItem>();
         public static List<Modifier> singleUseModifiers = new List<Modifier>();
         public static Dictionary<int, float> oldOffsetDict = new Dictionary<int, float>();
@@ -81,6 +82,11 @@ namespace AuthorableModifiers
             {
                 m.Activate();
             }
+            autoLightings.Sort((a1, a2) => a1.startTick.CompareTo(a2.startTick));
+            foreach (AutoLighting al in autoLightings)
+            {
+                al.Preload();
+            }
         }
 
         public static void LoadModifierCues(bool fromRestart = false)
@@ -107,7 +113,7 @@ namespace AuthorableModifiers
             }
             foreach (Modifier m in preloadModifiers)
             {
-                 m.Activate();                                         
+                 m.Activate();    
             }
             foreach(Modifier m in awaitEnableModifiers)
             {

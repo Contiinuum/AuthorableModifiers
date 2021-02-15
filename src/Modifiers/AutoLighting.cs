@@ -61,24 +61,29 @@ namespace AuthorableModifiers
             StopLightshow();
         }
 
-        public void StartLightshow()
+        public void Preload()
         {
             if (!Integrations.arenaLoaderFound || !Config.enabled) return;
-            StopLightshow();
             maxBrightness = AuthorableModifiersMod.defaultArenaBrightness * originalMaxBrightness;
-            
+
             List<SongCues.Cue> cues = SongCues.I.mCues.cues.ToList();
             float tick = AudioDriver.I.mCachedTick;
             mapIntensity = CalculateIntensity(cues.First().tick, cues.Last().tick, cues.ToList());
             for (int i = cues.Count - 1; i >= 0; i--)
             {
-                if (cues[i].tick < tick) cues.RemoveAt(i);               
-                else if (cues[i].behavior == Target.TargetBehavior.Dodge) cues.RemoveAt(i);
+                //if (cues[i].tick < tick) cues.RemoveAt(i);               
+                if (cues[i].behavior == Target.TargetBehavior.Dodge) cues.RemoveAt(i);
             }
-            
-            active = true;
-            Task.Run(() => PrepareLightshow(cues));
+            Task.Run(() => PrepareLightshow(cues));           
+        }
 
+        public void StartLightshow()
+        {
+            if (!Integrations.arenaLoaderFound || !Config.enabled) return;
+            StopLightshow();
+           
+            active = true;
+            lightshowToken = MelonCoroutines.Start(BetterLightshow());
             if (pulseMode)
             {
                 fadeToBlackStartTick = AudioDriver.I.mCachedTick;
@@ -163,7 +168,15 @@ namespace AuthorableModifiers
                 await PreparePulse(cues);
             }
             brightnessEvents.Sort((cue1, cue2) => cue1.startTick.CompareTo(cue2.startTick));
-            lightshowToken = MelonCoroutines.Start(BetterLightshow());
+            for(int i = brightnessEvents.Count -1; i >= 0; i--)
+            {
+                if (brightnessEvents[i].startTick < AudioDriver.I.mCachedTick) brightnessEvents.RemoveAt(i);
+            }
+            for (int i = psyEvents.Count - 1; i >= 0; i--)
+            {
+                if (psyEvents[i].startTick < AudioDriver.I.mCachedTick) psyEvents.RemoveAt(i);
+            }
+            //lightshowToken = MelonCoroutines.Start(BetterLightshow());
         }
 
         private async Task PreparePulse(List<SongCues.Cue> cues)
@@ -236,6 +249,10 @@ namespace AuthorableModifiers
             }
             startIndex = 0;
             sections.Sort((section1, section2) => section1.start.CompareTo(section2.start));
+            //if(startTick >= 960f)
+            //{
+                brightnessEvents.Add(new BrightnessEvent(.5f * maxBrightness, startTick, startTick + 960f));
+            //}
             foreach (Section section in sections)
             {
                 float sectionBrightnessSum = 0f;
@@ -331,7 +348,6 @@ namespace AuthorableModifiers
 
         private IEnumerator BetterLightshow()
         {
-
             //List<SongCues.Cue> cues = SongCues.I.mCues.cues.ToList();
             while (active)
             {
@@ -461,6 +477,12 @@ namespace AuthorableModifiers
                 ArenaLoaderMod.CurrentSkyboxExposure = currentExp;
                 yield return new WaitForSecondsRealtime(.02f);
             }
+            RenderSettings.skybox.SetFloat("_exposure", targetExposure);
+            ArenaLoaderMod.CurrentSkyboxReflection = 0f;
+            ArenaLoaderMod.ChangeReflectionStrength(targetReflection);
+            ArenaLoaderMod.CurrentSkyboxExposure = targetExposure;
+            yield break;
+            
 
         }
 

@@ -39,8 +39,9 @@ namespace AuthorableModifiers
             {
                 float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
                 float currentExp = Mathf.Lerp(oldExposure, amount, percentage / 100f);
-                float targetReflection = amount / AuthorableModifiersMod.defaultArenaBrightness;
-                targetReflection = .5f + (amount * targetReflection);
+                //float targetReflection = amount / AuthorableModifiersMod.defaultArenaBrightness;
+                float targetReflection = .5f + (amount * .5f);
+                //targetReflection = .5f + (amount * targetReflection);
                 float currentReflection = Mathf.Lerp(oldReflection, targetReflection, percentage / 100f);
                 RenderSettings.skybox.SetFloat("_Exposure", currentExp);
                 ArenaLoaderMod.CurrentSkyboxReflection = 0f;
@@ -56,7 +57,7 @@ namespace AuthorableModifiers
         {
             base.Deactivate();
             RenderSettings.skybox.SetFloat("_Exposure", amount);
-            RenderSettings.reflectionIntensity = amount;            
+            RenderSettings.reflectionIntensity = .5f + (.5f * amount);            
         }
     }
 }
