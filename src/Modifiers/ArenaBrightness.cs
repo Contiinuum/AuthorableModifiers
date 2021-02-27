@@ -47,8 +47,9 @@ namespace AuthorableModifiers
                 //if (amount < minBrightness) amount = minBrightness;
                 ArenaLoaderMod.ChangeExposure(newExposure);
                 ArenaLoaderMod.CurrentSkyboxReflection = 0f;
-                float newReflection = newExposure / AuthorableModifiersMod.defaultArenaBrightness;
-                newReflection = .5f + (newExposure * newReflection);
+                //float newReflection = newExposure / AuthorableModifiersMod.defaultArenaBrightness;
+                //newReflection = .5f + (newExposure * newReflection);
+                float newReflection = .5f + (newExposure * .5f);
                 ArenaLoaderMod.ChangeReflectionStrength(newReflection);
             }
 
@@ -69,8 +70,9 @@ namespace AuthorableModifiers
                     if (dir == 1) amnt *= Config.intensity;
                     ArenaLoaderMod.ChangeExposure(amnt);
 
-                    float newReflection = amnt / AuthorableModifiersMod.defaultArenaBrightness;
-                    newReflection = .5f + (amnt * newReflection);
+                    //float newReflection = amnt / AuthorableModifiersMod.defaultArenaBrightness;
+                    //newReflection = .5f + (amnt * newReflection);
+                    float newReflection = .5f + (amnt * .5f);
                     ArenaLoaderMod.ChangeReflectionStrength(newReflection);
                     if (dir == 1) dir = 0;
                     else if (dir == 0) dir = 1;
