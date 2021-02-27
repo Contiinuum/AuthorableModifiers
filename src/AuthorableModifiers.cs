@@ -86,6 +86,7 @@ namespace AuthorableModifiers
             foreach (AutoLighting al in autoLightings)
             {
                 al.Preload();
+                //break;
             }
         }
 
@@ -107,6 +108,7 @@ namespace AuthorableModifiers
                 modifiersFound = false;
                 return;
             }
+            SetOldColors(KataConfig.I.leftHandColor, KataConfig.I.rightHandColor);
             if (Integrations.autoLightshowFound)
             {
                 EnableAutoLightshow(false);
@@ -245,10 +247,29 @@ namespace AuthorableModifiers
         {
             if (!fromBack)
             {
-                foreach (Modifier mod in awaitDisableModifiers) mod.Deactivate();
+                foreach (Modifier mod in awaitDisableModifiers)
+                {
+                    if(mod.type != ModifierType.ColorChange && mod.type != ModifierType.ColorUpdate)
+                        mod.Deactivate();
+                }
+                   
                 foreach (Modifier mod in preloadModifiers) mod.Deactivate();
-                foreach (Modifier mod in singleUseModifiers) mod.Deactivate();          
-                foreach (ModifierQueueItem item in modifierQueue) item.modifier.Deactivate();
+                foreach (Modifier mod in singleUseModifiers)
+                {
+                    if (mod.type != ModifierType.ColorChange && mod.type != ModifierType.ColorUpdate)
+                        mod.Deactivate();
+                }
+        
+                foreach (ModifierQueueItem item in modifierQueue)
+                {
+                    if (item.modifier.type != ModifierType.ColorChange && item.modifier.type != ModifierType.ColorUpdate)
+                        item.modifier.Deactivate();
+                }
+
+                if (oldColorsSet)
+                {
+                    new ColorChange(ModifierType.ColorChange, 0, 0, new float[] { 0f, 0f, 0f }, new float[] { 0f, 0f, 0f }).UpdateColors(oldLeftHandColor, oldRightHandColor);
+                }
             }
             
             modifierQueue.Clear();
@@ -256,12 +277,10 @@ namespace AuthorableModifiers
             awaitEnableModifiers.Clear();
             preloadModifiers.Clear();
             singleUseModifiers.Clear();
+            autoLightings.Clear();
             activePsychedelia = null;
             activeColorChange = null;
-            if (oldColorsSet)
-            {
-                new ColorChange(ModifierType.ColorChange, 0, 0, new float[] { 0f, 0f, 0f }, new float[] { 0f, 0f, 0f }).UpdateColors(oldLeftHandColor, oldRightHandColor);
-            }
+            
                 
             if (Integrations.arenaLoaderFound)
             {

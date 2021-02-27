@@ -232,7 +232,8 @@ namespace AuthorableModifiers
                                             modifiersJSON["modifiers"][i]["endTick"],
                                             modifiersJSON["modifiers"][i]["amount"] / p,
                                             modifiersJSON["modifiers"][i]["option1"]);
-                                        AuthorableModifiersMod.autoLightings.Add(modifierCue as AutoLighting);
+                                        AutoLighting al = modifierCue as AutoLighting;
+                                        AuthorableModifiersMod.autoLightings.Add(al);
                                         break;
                                     default:
                                         break;
