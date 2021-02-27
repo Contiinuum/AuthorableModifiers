@@ -170,7 +170,7 @@ namespace AuthorableModifiers
             private static void Postfix(LaunchPanel __instance)
             {
                 if (!Config.enabled || !AuthorableModifiersMod.modifiersFound) return;
-                AuthorableModifiersMod.DestroyPopup(-1);
+                AuthorableModifiersMod.DestroyPopup(-1,true);
             }
         }
     }

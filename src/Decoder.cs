@@ -222,7 +222,8 @@ namespace AuthorableModifiers
                                             modifiersJSON["modifiers"][i]["xoffset"], // x offset
                                             modifiersJSON["modifiers"][i]["yoffset"], // y offset
                                             modifiersJSON["modifiers"][i]["zoffset"], // z offset
-                                            modifiersJSON["modifiers"][i]["option1"]);
+                                            modifiersJSON["modifiers"][i]["option1"], // glow
+                                            modifiersJSON["modifiers"][i]["independantBool"]);// face forward
                                         break;
                                     case ModifierType.AutoLighting:
                                         if (!Integrations.arenaLoaderFound) continue;
