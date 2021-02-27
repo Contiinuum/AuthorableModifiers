@@ -41,6 +41,7 @@ namespace AuthorableModifiers
             {
                 if (KataConfig.I.practiceMode) return;
                 if (!AuthorableModifiersMod.modifiersFound) return;
+                if (TutorialFlow.I.mIsTutorialSong) return;
                 AuthorableModifiersMod.ApplyZOffset();
                 //AuthorableModifiers.LoadModifierCues();
             }
