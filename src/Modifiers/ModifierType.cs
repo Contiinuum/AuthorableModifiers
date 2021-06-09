@@ -25,6 +25,9 @@ namespace AuthorableModifiers
         ArenaChange,
         OverlaySetter,
         TextPopup,
-        AutoLighting
+        AutoLighting,
+        ArenaScale,
+        ArenaPosition,
+        ArenaSpin
     }
 }

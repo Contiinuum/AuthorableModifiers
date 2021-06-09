@@ -12,6 +12,7 @@ namespace AuthorableModifiers
         public static bool arenaLoaderFound = false;
         public static bool scoreOverlayFound = false;
         public static bool autoLightshowFound = false;
+        public static bool songBrowserFound = false;
         public static void LookForIntegrations()
         {
             foreach (MelonMod mod in MelonHandler.Mods)
@@ -64,6 +65,22 @@ namespace AuthorableModifiers
                     {
                         MelonLogger.LogWarning("Auto Lightshow version not compatible. Update Auto Lightshow to use it with Authorable modifiers.");
                         autoLightshowFound = false;
+                    }
+                }
+                else if (mod.Assembly.GetName().Name == "SongBrowser")
+                {
+                    var scoreVersion = new Version(mod.Info.Version);
+                    var lastUnsupportedVersion = new Version("2.4.1"); //2.4.1 set to this when releasing
+                    var result = scoreVersion.CompareTo(lastUnsupportedVersion);
+                    if (result > 0)
+                    {
+                        songBrowserFound = true;
+                        MelonLogger.Log("Song Browser");
+                    }
+                    else
+                    {
+                        MelonLogger.LogWarning("Song Browser version not compatible. Update Song Browser to use it with Authorable modifiers.");
+                        songBrowserFound = false;
                     }
                 }
             }

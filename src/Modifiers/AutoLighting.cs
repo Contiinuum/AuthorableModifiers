@@ -64,16 +64,8 @@ namespace AuthorableModifiers
         public void Preload()
         {
             if (!Integrations.arenaLoaderFound || !Config.enabled) return;
-            maxBrightness = AuthorableModifiersMod.defaultArenaBrightness * originalMaxBrightness;
-            List<SongCues.Cue> cues = SongCues.I.mCues.cues.ToList();
-            float tick = AudioDriver.I.mCachedTick;
-            mapIntensity = CalculateIntensity(cues.First().tick, cues.Last().tick, cues.ToList());
-            for (int i = cues.Count - 1; i >= 0; i--)
-            {
-                //if (cues[i].tick < tick) cues.RemoveAt(i);               
-                if (cues[i].behavior == Target.TargetBehavior.Dodge) cues.RemoveAt(i);
-            }
-            Task.Run(() => PrepareLightshow(cues));           
+            
+            Task.Run(() => PrepareLightshow());           
         }
 
         public void StartLightshow()
@@ -149,8 +141,22 @@ namespace AuthorableModifiers
             await Task.CompletedTask;
         }
 
-        private async void PrepareLightshow(List<SongCues.Cue> cues)
+        private async void PrepareLightshow()
         {
+            maxBrightness = AuthorableModifiersMod.defaultArenaBrightness * originalMaxBrightness;
+            while(SongCues.I.mCues.cues.Count == 0)
+            {
+                await Task.Delay(100);
+            }
+            List<SongCues.Cue> cues = SongCues.I.mCues.cues.ToList();
+            float tick = AudioDriver.I.mCachedTick;
+            mapIntensity = CalculateIntensity(cues.First().tick, cues.Last().tick, cues.ToList());
+            for (int i = cues.Count - 1; i >= 0; i--)
+            {           
+                if (cues[i].behavior == Target.TargetBehavior.Dodge) cues.RemoveAt(i);
+            }
+
+
             float oldExposure = RenderSettings.skybox.GetFloat("_Exposure");
             brightnessEvents.Clear();
             psyEvents.Clear();

@@ -54,6 +54,7 @@ namespace AuthorableModifiers
             private static void Postfix(SongSelectItem __instance)
             {
                 //Set filePath
+                if (AuthorableModifiersMod.endless) return;
                 AuthorableModifiersMod.audicaFilePath = __instance.mSongData.foundPath;
                 AuthorableModifiersMod.LoadModifierCues();
                 //MelonLoader.MelonLogger.Log(__result.zipPath);
@@ -70,12 +71,25 @@ namespace AuthorableModifiers
             }
         }
 
+        [HarmonyPatch(typeof(MenuState), "SetState", new Type[] { typeof(MenuState.State)})]
+        private static class PatchMenuStateSetState
+        {
+            private static void Postfix(MenuState __instance, MenuState.State state)
+            {
+                if(state == MenuState.State.SongPage)
+                {
+                    AuthorableModifiersMod.SetEndlessActive(false);
+                }
+            }
+        }
+
         [HarmonyPatch(typeof(LaunchPanel), "Back")]
         private static class PatchLaunchPanelBack
         {
             private static void Postfix(LaunchPanel __instance)
             {
                 //Set filePath
+                AuthorableModifiersMod.SetEndlessActive(false);
                 AuthorableModifiersMod.Reset(true);
                 //MelonLoader.MelonLogger.Log(__result.zipPath);
             }
@@ -88,7 +102,7 @@ namespace AuthorableModifiers
             {
                 if (KataConfig.I.practiceMode) return;
                 if (!AuthorableModifiersMod.modifiersFound) return;
-                AuthorableModifiersMod.OnRestart();
+                AuthorableModifiersMod.OnRestart(true);
             }
         }
 
@@ -99,6 +113,7 @@ namespace AuthorableModifiers
             {
                 if (KataConfig.I.practiceMode) return;
                 if (!AuthorableModifiersMod.modifiersFound) return;
+                AuthorableModifiersMod.SetEndlessActive(false);
                 AuthorableModifiersMod.Reset();
             }
         }
@@ -121,6 +136,7 @@ namespace AuthorableModifiers
             {
                 if (KataConfig.I.practiceMode) return;
                 if (!AuthorableModifiersMod.modifiersFound) return;
+                if (AuthorableModifiersMod.endless) return;
                 AuthorableModifiersMod.OnRestart();
             }
         }

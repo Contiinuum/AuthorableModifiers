@@ -91,6 +91,9 @@
     <Reference Include="ScoreOverlay">
       <HintPath>D:\Games\Steam\steamapps\common\Audica\Mods\ScoreOverlay.dll</HintPath>
     </Reference>
+    <Reference Include="SongBrowser">
+      <HintPath>D:\Games\Steam\steamapps\common\Audica\Mods\SongBrowser.dll</HintPath>
+    </Reference>
     <Reference Include="SonyNP">
       <HintPath>lib\SonyNP.dll</HintPath>
       <Private>False</Private>
@@ -203,7 +206,11 @@
     <Compile Include="src\Modifiers\AimAssistChange.cs" />
     <Compile Include="src\Modifiers\ArenaBrightness.cs" />
     <Compile Include="src\Modifiers\ArenaChange.cs" />
+    <Compile Include="src\Modifiers\ArenaManipulation.cs" />
+    <Compile Include="src\Modifiers\ArenaScale.cs" />
+    <Compile Include="src\Modifiers\ArenaPosition.cs" />
     <Compile Include="src\Modifiers\ArenaRotation.cs" />
+    <Compile Include="src\Modifiers\ArenaSpin.cs" />
     <Compile Include="src\Modifiers\AutoLighting.cs" />
     <Compile Include="src\Modifiers\ColorSwap.cs" />
     <Compile Include="src\Modifiers\ColorUpdate.cs" />

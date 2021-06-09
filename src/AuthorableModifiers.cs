@@ -7,6 +7,7 @@ using System.Linq;
 using System.Collections;
 using ArenaLoader;
 using AutoLightshow;
+using AudicaModding;
 
 namespace AuthorableModifiers
 {
@@ -38,6 +39,8 @@ namespace AuthorableModifiers
         public static float userArenaReflection = 1f;
         public static float userArenaRotation = 0f;
 
+        public static bool endless = false;
+
         public static Dictionary<float, DebugTextPopup> popupTextDictionary = new Dictionary<float, DebugTextPopup>();
         public static bool lightshowWasEnabled = false;
         public static class BuildInfo
@@ -45,8 +48,13 @@ namespace AuthorableModifiers
             public const string Name = "AuthorableModifiers";  // Name of the Mod.  (MUST BE SET)
             public const string Author = "Continuum"; // Author of the Mod.  (Set as null if none)
             public const string Company = null; // Company that made the Mod.  (Set as null if none)
-            public const string Version = "1.2.4"; // Version of the Mod.  (MUST BE SET)
+            public const string Version = "1.2.5"; // Version of the Mod.  (MUST BE SET)
             public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
+        }
+
+        public static void SetEndlessActive(bool active)
+        {
+            endless = active;
         }
 
         public override void OnApplicationStart()
@@ -89,23 +97,35 @@ namespace AuthorableModifiers
                 //break;
             }
         }
-
+        public static bool modifiersLoaded = false;
         public static void LoadModifierCues(bool fromRestart = false)
         {
-            if (!Config.enabled) return;
-            if (KataConfig.I.practiceMode) return;
+            if (!Config.enabled || KataConfig.I.practiceMode)
+            {
+                modifiersLoaded = true;
+                return;
+            }
+            modifiersLoaded = false;
             Reset();
             if (audicaFilePath.Length == 0)
             {
                 MelonLogger.Log("Audica file path not found.");
                 modifiersFound = false;
+                modifiersLoaded = true;
                 return;
             }
+            MelonLogger.LogWarning(audicaFilePath);
             awaitEnableModifiers = Decoder.GetModifierCues(audicaFilePath);
+
             if (awaitEnableModifiers is null || (awaitEnableModifiers.Count == 0 && preloadModifiers.Count == 0 && zOffsetList.Count == 0))
             {
                 //MelonLogger.Log("Couldn't load data in modifierCues.json. Please check if there are any typos present.");
                 modifiersFound = false;
+                modifiersLoaded = true;
+                if (endless)
+                {
+                    ResetArena(true);
+                }
                 return;
             }
             SetOldColors(KataConfig.I.leftHandColor, KataConfig.I.rightHandColor);
@@ -113,9 +133,18 @@ namespace AuthorableModifiers
             {
                 EnableAutoLightshow(false);
             }
+            bool arenaChanged = false;
             foreach (Modifier m in preloadModifiers)
             {
-                 m.Activate();    
+                if (endless && !arenaChanged)
+                {
+                    if (m.type == ModifierType.ArenaChange) arenaChanged = true;
+                }
+                m.Activate();
+            }
+            if(endless && !arenaChanged)
+            {
+                ResetArena(true);
             }
             foreach(Modifier m in awaitEnableModifiers)
             {
@@ -126,8 +155,21 @@ namespace AuthorableModifiers
             //awaitEnableModifiers.Sort((mod1, mod2) => mod1.startTick.CompareTo(mod2.startTick));
             modifierQueue.Sort((mod1, mod2) => (mod1.tick - (int)mod1.action).CompareTo((mod2.tick - (int)mod2.action)));
             modifiersFound = true;
-            if((Config.enableFlashingLights || Config.enableArenaRotation) && !fromRestart && !Config.hideWarning)
+            if((Config.enableFlashingLights || Config.enableArenaRotation) && !fromRestart && !Config.hideWarning && !endless)
                 MelonCoroutines.Start(IWaitForArenaLoad("<color=\"red\">WARNING</color>\nMay contain flashing lights and rotating arenas. \nThis can be disabled in Mod Settings.", .001f));
+            //if (endless) MelonCoroutines.Start(StartTimer());
+            //else modifiersLoaded = true;
+            MelonCoroutines.Start(WaitForArenaSwitch());
+            //modifiersLoaded = true;
+        }
+
+        private static IEnumerator WaitForArenaSwitch()
+        {
+            while (EnvironmentLoader.I.IsSwitching())
+            {
+                yield return new WaitForSecondsRealtime(.2f);
+            }
+            modifiersLoaded = true;
         }
 
         private static void EnableAutoLightshow(bool enable)
@@ -212,11 +254,20 @@ namespace AuthorableModifiers
             userArenaReflection = reflection;
         }
 
-        public static void OnRestart()
+        public static void OnRestart(bool ingameRestart = false)
         {
+            if (endless) return;
             if (!Config.enabled) return;
-            if (!modifiersFound) return;          
-            ResetValues();
+            if (!modifiersFound) return;
+            
+            if (ingameRestart)
+            {
+                Reset();
+            }
+            else
+            {
+                ResetValues();
+            }
             LoadModifierCues(true);
         }
 
@@ -227,8 +278,11 @@ namespace AuthorableModifiers
             modifiersFound = false;
             ResetValues(fromBack);
             DestroyPopup(0, true);
-            oldColorsSet = false;
-            oldArenaSet = false;
+            if (!endless)
+            {
+                oldColorsSet = false;
+                oldArenaSet = false;
+            }
             zOffsetList.Clear();
             oldOffsetDict.Clear();
             if(Integrations.autoLightshowFound) EnableAutoLightshow(true);
@@ -285,17 +339,34 @@ namespace AuthorableModifiers
             autoLightings.Clear();
             activePsychedelia = null;
             activeColorChange = null;
+            GameObject go = GameObject.Find("World");
+            if(go != null)
+            {
+                Transform world = go.transform;
+                world.transform.position = Vector3.zero;
+                world.transform.eulerAngles = Vector3.zero;
+                world.transform.localScale = new Vector3(1f, 1f, 1f);
+            }
+
+            ResetArena();
             
-                
+        }
+
+        private static void ResetArena(bool forceReset = false)
+        {
             if (Integrations.arenaLoaderFound)
             {
                 if (oldArena.Length > 0 && oldArenaSet)
                 {
-                    if(oldArena != PlayerPreferences.I.Environment.Get())
+                    if(!endless || forceReset)
                     {
-                        PlayerPreferences.I.Environment.Set(oldArena);
-                        EnvironmentLoader.I.SwitchEnvironment();                    
-                    }                   
+                        if (oldArena != PlayerPreferences.I.Environment.Get())
+                        {
+                            PlayerPreferences.I.Environment.Set(oldArena);
+                            EnvironmentLoader.I.SwitchEnvironment();
+                        }
+                    }
+                    
                 }
                 MelonCoroutines.Start(IResetArenaValues(true));
             }
@@ -320,19 +391,35 @@ namespace AuthorableModifiers
 
         public override void OnUpdate()
         {
+            /*if (Input.GetKeyDown(KeyCode.L))
+            {
+                AutoPlayer.EnableAutoplayer(!AutoPlayer.I.IsAutoPlayerEnabled);
+                MelonLogger.Log("Auto player is " + (AutoPlayer.I.IsAutoPlayerEnabled ? "enabled" : "disabled"));                
+                
+            }
+            if (Input.GetKeyDown(KeyCode.P) && MenuState.sState == MenuState.State.Launched)
+            {
+                InGameUI.I.GoToPausePage(true);
+            }*/
+
             if (!Config.enabled) return;
             if (MenuState.sState != MenuState.State.Launched) return;
             if (!modifiersFound) return;
             if (AudioDriver.I is null) return;
             if (!AudioDriver.I.IsPlaying()) return;
             float currentTick = AudioDriver.I.mCachedTick;
-
             if(modifierQueue.Count > 0)
             {
                 if(modifierQueue[0].tick <= currentTick)
                 {
-                    if (modifierQueue[0].action == Action.Activate) modifierQueue[0].modifier.Activate();
-                    else modifierQueue[0].modifier.Deactivate();
+                    if (modifierQueue[0].action == Action.Activate)
+                    {
+                        modifierQueue[0].modifier.Activate();
+                    }
+                    else
+                    {
+                        modifierQueue[0].modifier.Deactivate();
+                    }
 
                     modifierQueue.RemoveAt(0);
                 }

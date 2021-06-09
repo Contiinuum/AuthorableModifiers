@@ -236,6 +236,42 @@ namespace AuthorableModifiers
                                         AutoLighting al = modifierCue as AutoLighting;
                                         AuthorableModifiersMod.autoLightings.Add(al);
                                         break;
+                                    case ModifierType.ArenaScale:
+                                    case ModifierType.ArenaPosition:
+                                    case ModifierType.ArenaSpin:
+                                        if (!Config.enableArenaManipulation) continue;
+                                        modifierCue = new ArenaScale(type,
+                                            modifiersJSON["modifiers"][i]["startTick"],
+                                            modifiersJSON["modifiers"][i]["endTick"],
+                                            modifiersJSON["modifiers"][i]["xoffset"],
+                                            modifiersJSON["modifiers"][i]["yoffset"],
+                                            modifiersJSON["modifiers"][i]["zoffset"],
+                                            modifiersJSON["modifiers"][i]["option1"],
+                                            modifiersJSON["modifiers"][i]["option2"]);
+                                        preload = modifiersJSON["modifiers"][i]["option2"];
+                                        break;
+                                    /*case ModifierType.ArenaPosition:
+                                        if (!Config.enableArenaManipulation) continue;
+                                        modifierCue = new ArenaPosition(type,
+                                            modifiersJSON["modifiers"][i]["startTick"],
+                                            modifiersJSON["modifiers"][i]["endTick"],
+                                            modifiersJSON["modifiers"][i]["xoffset"],
+                                            modifiersJSON["modifiers"][i]["yoffset"],
+                                            modifiersJSON["modifiers"][i]["zoffset"],
+                                            modifiersJSON["modifiers"][i]["option1"],
+                                            modifiersJSON["modifiers"][i]["option2"]);
+                                        break;
+                                    case ModifierType.ArenaSpin:
+                                        if (!Config.enableArenaManipulation) continue;
+                                        modifierCue = new ArenaSpin(type,
+                                            modifiersJSON["modifiers"][i]["startTick"],
+                                            modifiersJSON["modifiers"][i]["endTick"],
+                                            modifiersJSON["modifiers"][i]["xoffset"],
+                                            modifiersJSON["modifiers"][i]["yoffset"],
+                                            modifiersJSON["modifiers"][i]["zoffset"],
+                                            modifiersJSON["modifiers"][i]["option1"],
+                                            modifiersJSON["modifiers"][i]["option2"]);
+                                        break;*/
                                     default:
                                         break;
                                 }

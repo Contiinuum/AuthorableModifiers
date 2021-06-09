@@ -12,6 +12,7 @@ namespace AuthorableModifiers
         public static bool enablePsychedelia;
         public static bool enableFlashingLights;
         public static bool enableArenaRotation;
+        public static bool enableArenaManipulation;
         public static bool enableScoreDisablingModifiers;
         public static bool hideWarning;
 
@@ -25,6 +26,7 @@ namespace AuthorableModifiers
             MelonPrefs.RegisterBool(Category, nameof(enableColorChange), true, "Allows maps to change your colors.");
             MelonPrefs.RegisterBool(Category, nameof(enableFlashingLights), true, "Allows maps to use brightness changes and flashing lights. TURN THIS OFF IF YOU HAVE EPILEPSY!");
             MelonPrefs.RegisterBool(Category, nameof(enableArenaRotation), true, "Allows maps to rotate the arena. TURN THIS OFF IF YOU EASILY SUFFER FROM MOTION SICKNESS!");
+            MelonPrefs.RegisterBool(Category, nameof(enableArenaManipulation), true, "Allows maps to manipulate the arena (rotate, move, scale). TURN THIS OFF IF YOU EASILY SUFFER FROM MOTION SICKNESS!");
             MelonPrefs.RegisterBool(Category, nameof(enablePsychedelia), true, "Allows maps to make use of Psychedelia.");
             MelonPrefs.RegisterBool(Category, nameof(enableScoreDisablingModifiers), false, "Allows mods to use modifiers that disable posting your score to the leaderboards.");
             MelonPrefs.RegisterBool(Category, nameof(hideWarning), false, "Hides the warning before starting a song.");
