@@ -12,18 +12,23 @@ namespace AuthorableModifiers
 {
     public class SpeedChange : Modifier
     {
-        private RampMode rampmode = RampMode.Up;
-        private bool tempoRampActive = false;
-        private bool isOST = false;
-        public SpeedChange(ModifierType _type, float _startTick, float _endTick, float _amount)
+        private readonly bool isOST = false;
+
+        public SpeedChange()
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
-            amount = _amount;
             isOST = SongDataHolder.I.songData.IsCoreSong() || SongDataHolder.I.songData.dlc;
         }
 
+        /*
+        public SpeedChange(ModifierType _type, float _startTick, float _endTick, float _amount)
+        {
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
+            Amount = _amount;
+            isOST = SongDataHolder.I.songData.IsCoreSong() || SongDataHolder.I.songData.dlc;
+        }
+        */
         public override void Activate()
         {
             base.Activate();               
@@ -33,7 +38,7 @@ namespace AuthorableModifiers
         public override void Deactivate()
         {
             base.Deactivate();
-            if(amount >= 1f && !isOST) ScoreKeeper.I.GetScoreValidity();
+            if(Amount >= 1f && !isOST) ScoreKeeper.I.GetScoreValidity();
             //MelonCoroutines.Start(TempoRamp());
         }
 
@@ -41,10 +46,10 @@ namespace AuthorableModifiers
         {
             //float progress = 0;
             float oldSpeed = AudioDriver.I.GetSpeed();
-            while (active)
+            while (Active)
             {
-                float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
-                float currentSpeed = Mathf.Lerp(oldSpeed, amount, percentage / 100f);
+                float percentage = ((AudioDriver.I.mCachedTick - StartTick) * 100f) / (EndTick - StartTick);
+                float currentSpeed = Mathf.Lerp(oldSpeed, Amount, percentage / 100f);
                 AudioDriver.I.SetSpeed(currentSpeed);
                 /*if (rampmode == RampMode.Up)
                 {
@@ -68,7 +73,7 @@ namespace AuthorableModifiers
                         yield break;
                     }
                 }*/
-                if (amount >= 1f && !isOST) ScoreKeeper.I.GetScoreValidity();
+                if (Amount >= 1f && !isOST) ScoreKeeper.I.GetScoreValidity();
                 //progress++;
                 yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }

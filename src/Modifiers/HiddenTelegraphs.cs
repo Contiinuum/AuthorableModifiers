@@ -9,12 +9,12 @@ namespace AuthorableModifiers
 {
     public class HiddenTelegraphs : Modifier
     {
-        public HiddenTelegraphs(ModifierType _type, float _startTick, float _endTick)
+        /*public HiddenTelegraphs(ModifierType _type, float _startTick, float _endTick)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
-        }
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
+        }*/
 
         public override void Activate()
         {

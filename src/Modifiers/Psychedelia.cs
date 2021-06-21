@@ -12,20 +12,20 @@ namespace AuthorableModifiers
 {
     public class Psychedelia : Modifier
     {
-        private static float defaultPsychadeliaPhaseSeconds = 14.28f;
+        private readonly static float defaultPsychadeliaPhaseSeconds = 14.28f;
         private float psychadeliaTimer = 0.0f;
 
-        public Psychedelia(ModifierType _type, float _startTick, float _endTick, float _amount)
+        /*public Psychedelia(ModifierType _type, float _startTick, float _endTick, float _amount)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
-            amount = _amount;
-        }
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
+            Amount = _amount;
+        }*/
 
         public override void Activate()
         {
-            amount /= 20f;
+            Amount /= 20f;
             AuthorableModifiersMod.activePsychedelia = this;
             base.Activate();
             MelonCoroutines.Start(DoPsychedelia());
@@ -39,9 +39,9 @@ namespace AuthorableModifiers
         }
         private IEnumerator DoPsychedelia()
         {
-            while (active)
+            while (Active)
             {              
-                float phaseTime = defaultPsychadeliaPhaseSeconds / amount;
+                float phaseTime = defaultPsychadeliaPhaseSeconds / Amount;
                 
                 if (psychadeliaTimer <= phaseTime)
                 {

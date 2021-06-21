@@ -12,26 +12,32 @@ namespace AuthorableModifiers
 {
     public class ArenaManipulation : Modifier
     {
-        private string amountX, amountY, amountZ;
+        public string AmountX { get; set; }
+        public string AmountY { get; set; }
+        public string AmountZ { get; set; }
         private Vector3 targetAmount = new Vector3();
-        private float? parsedX, parsedY, parsedZ;
-        private Transform world;
+        //private float? parsedX, parsedY, parsedZ;
+        private readonly Transform world;
         private Vector3 currentAmount;
-        private Quaternion targetRotation;
-        private Quaternion currentRotation;
-        private bool preload;
-        private bool reset;
-        protected ArenaManipulation(ModifierType _type, float _startTick, float _endTick, string _amountX, string _amountY, string _amountZ, bool _reset, bool _preload)
+        //private Quaternion targetRotation;
+        //private Quaternion currentRotation;
+        public bool Preload { get; set; }
+        public bool Reset { get; set; }
+        /*protected ArenaManipulation(ModifierType _type, float _startTick, float _endTick, string _amountX, string _amountY, string _amountZ, bool _reset, bool _preload)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
             world = GameObject.Find("World").transform;
-            amountX = _amountX;
-            amountY = _amountY;
-            amountZ = _amountZ;
-            reset = _reset;
-            preload = _preload;           
+            AmountX = _amountX;
+            AmountY = _amountY;
+            AmountZ = _amountZ;
+            Reset = _reset;
+            Preload = _preload;           
+        }*/
+        public ArenaManipulation()
+        {
+            world = GameObject.Find("World").transform;
         }
 
         public override void Activate()
@@ -40,14 +46,14 @@ namespace AuthorableModifiers
             GetCurrentAmount();
             GetTargetAmount();
 
-            if (preload)
+            if (Preload)
             {
                 SetAmount(targetAmount);
             }
             else
             {
                 base.Activate();
-                if (endTick == startTick || endTick == 0)
+                if (EndTick == StartTick || EndTick == 0)
                 {
                     SetAmount(targetAmount);
                 }
@@ -65,7 +71,7 @@ namespace AuthorableModifiers
 
         private void GetCurrentAmount()
         {
-            switch (type)
+            switch (Type)
             {
                 case ModifierType.ArenaPosition:
                     currentAmount = world.position;
@@ -84,36 +90,35 @@ namespace AuthorableModifiers
 
         private void GetTargetAmount()
         {
-            if (reset)
+            if (Reset)
             {
-                Reset();
+                ResetArena();
             }
             else
             {
-                float _x, _y, _z;
 
-                if (float.TryParse(amountX, out _x))
+                if (float.TryParse(AmountX, out float _x))
                 {
                     targetAmount.x = _x + currentAmount.x;
-                    parsedX = _x;
+                    //parsedX = _x;
                 }
                 else 
                 { 
                     targetAmount.x = currentAmount.x;
                 }
-                if (float.TryParse(amountY, out _y))
+                if (float.TryParse(AmountY, out float _y))
                 {
                     targetAmount.y = _y + currentAmount.y;
-                    parsedY = _y;
+                    //parsedY = _y;
                 }
                 else
                 {
                     targetAmount.y = currentAmount.y;
                 }
-                if (float.TryParse(amountZ, out _z))
+                if (float.TryParse(AmountZ, out float _z))
                 {
                     targetAmount.z = _z + currentAmount.z;
-                    parsedZ = _z;
+                    //parsedZ = _z;
                 }
                 else
                 {
@@ -134,25 +139,25 @@ namespace AuthorableModifiers
             return amnt;
         }
 
-        protected Vector3 GetRotation(float percentage)
+        /*protected Vector3 GetRotation(float percentage)
         {
-            float seconds = AudioDriver.TickSpanToMs(SongDataHolder.I.songData, startTick, endTick);
+            float seconds = AudioDriver.TickSpanToMs(SongDataHolder.I.songData, StartTick, EndTick);
             seconds *= 1000;
             return targetAmount / seconds;
 
             //return Quaternion.Lerp(currentRotation, targetRotation, percentage);            
-        }
+        }*/
 
         private IEnumerator DoManipulation()
         {
-            while (active)
+            while (Active)
             {
-                float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
+                float percentage = ((AudioDriver.I.mCachedTick - StartTick) * 100f) / (EndTick - StartTick);
                 percentage /= 100f;
-                if (type == ModifierType.ArenaSpin) SetAmount(GetAmount(percentage));
+                if (Type == ModifierType.ArenaSpin) SetAmount(GetAmount(percentage));
                 else SetAmount(GetAmount(percentage));
 
-                yield return new WaitForSecondsRealtime(.001f);
+                yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }
             SetAmount(targetAmount);
         }
@@ -163,14 +168,14 @@ namespace AuthorableModifiers
             return Mathf.Lerp(current, target, percentage);
         }
 
-        private void SetAmount(Quaternion rot)
+        /*private void SetAmount(Quaternion rot)
         {
             world.transform.rotation = rot;
-        }
+        }*/
 
         private void SetAmount(Vector3 _amount)
         {
-            switch (type)
+            switch (Type)
             {       
                 case ModifierType.ArenaPosition:
                     world.transform.position = _amount;
@@ -189,9 +194,9 @@ namespace AuthorableModifiers
             }
         }
 
-        private void Reset()
+        private void ResetArena()
         {
-            switch (type)
+            switch (Type)
             {
                 case ModifierType.ArenaPosition:
                     targetAmount = Vector3.zero;
@@ -200,7 +205,7 @@ namespace AuthorableModifiers
                     targetAmount = new Vector3(1f, 1f, 1f);
                     break;
                 case ModifierType.ArenaSpin:
-                    targetRotation = Quaternion.identity;
+                    //targetRotation = Quaternion.identity;
                     targetAmount = Vector3.zero;
                     break;
                 default:

@@ -16,7 +16,7 @@ namespace AuthorableModifiers
         private const float intensityWeight = 1.5f;
         private const float threshholdIncrement = .225f;
 
-        private bool pulseMode;
+        public bool PulseMode { get; set; }
 
         private object faderToken;
         private object fadeToBlackToken;
@@ -28,26 +28,26 @@ namespace AuthorableModifiers
         private object psyToken;
 
         private float lastPsyTimer = 0f;
-        private float defaultPsychadeliaPhaseSeconds = 14.28f;
+        private readonly float defaultPsychadeliaPhaseSeconds = 14.28f;
         private float psychadeliaTimer = 0.0f;
 
         private float maxBrightness;
-        private float originalMaxBrightness;
-        private float fadeOutTime = 240f;
+        public float OriginalMaxBrightness { get; set; }
+        private readonly float fadeOutTime = 240f;
         private float mapIntensity;
 
         private  int startIndex = 0;
-        private static List<BrightnessEvent> brightnessEvents = new List<BrightnessEvent>();
-        private static List<PsyEvent> psyEvents = new List<PsyEvent>();
+        private readonly static List<BrightnessEvent> brightnessEvents = new List<BrightnessEvent>();
+        private readonly static List<PsyEvent> psyEvents = new List<PsyEvent>();
 
-        public AutoLighting(ModifierType _type, float _startTick, float _endTick, float _maxBrightness, bool _pulseMode)
+        /*public AutoLighting(ModifierType _type, float _startTick, float _endTick, float _maxBrightness, bool _pulseMode)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
             pulseMode = _pulseMode;
             originalMaxBrightness = _maxBrightness;
-        }
+        }*/
 
         public override void Activate()
         {
@@ -72,9 +72,9 @@ namespace AuthorableModifiers
         {
             if (!Integrations.arenaLoaderFound || !Config.enabled) return;
             StopLightshow();
-            active = true;
+            Active = true;
             lightshowToken = MelonCoroutines.Start(BetterLightshow());
-            if (pulseMode)
+            if (PulseMode)
             {
                 fadeToBlackStartTick = AudioDriver.I.mCachedTick;
                 fadeToBlackEndTick = fadeToBlackStartTick + (fadeOutTime / mapIntensity);
@@ -120,30 +120,9 @@ namespace AuthorableModifiers
             return intensity;
         }
 
-        private async Task PrepareFade(float targetExposure)
-        {
-            float oldExposure = RenderSettings.skybox.GetFloat("_Exposure");
-            float oldReflection = RenderSettings.reflectionIntensity;
-            ArenaLoaderMod.CurrentSkyboxExposure = oldExposure;
-            float startTick = AudioDriver.I.mCachedTick;
-            float _endTick = startTick + 960f;
-            float percentage = 0f;
-            while (percentage < 100f)
-            {
-                percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (_endTick - startTick);
-                float currentExp = Mathf.Lerp(oldExposure, targetExposure, percentage / 100f);
-                float currentRef = Mathf.Lerp(oldReflection, targetExposure, percentage / 100f);
-                RenderSettings.skybox.SetFloat("_Exposure", currentExp);
-                ArenaLoaderMod.CurrentSkyboxReflection = 0f;
-                ArenaLoaderMod.ChangeReflectionStrength(currentRef);
-                ArenaLoaderMod.CurrentSkyboxExposure = currentExp;
-            }
-            await Task.CompletedTask;
-        }
-
         private async void PrepareLightshow()
         {
-            maxBrightness = AuthorableModifiersMod.defaultArenaBrightness * originalMaxBrightness;
+            maxBrightness = AuthorableModifiersMod.defaultArenaBrightness * OriginalMaxBrightness;
             while(SongCues.I.mCues.cues.Count == 0)
             {
                 await Task.Delay(100);
@@ -161,7 +140,7 @@ namespace AuthorableModifiers
             brightnessEvents.Clear();
             psyEvents.Clear();
             ArenaLoaderMod.CurrentSkyboxExposure = oldExposure;
-            if (!pulseMode)
+            if (!PulseMode)
             {
                 //await PrepareFade(maxBrightness * .5f);
                 await PrepareAsync(cues);
@@ -321,7 +300,7 @@ namespace AuthorableModifiers
         private void CalculateSections(List<SongCues.Cue> cues, List<Section> sections, float start, float end, float threshhold, float startIndex = 0)
         {
             float intensity = CalculateIntensity(start, end, cues);
-            intensity = intensity / Mathf.Pow(mapIntensity, intensityNormExp);
+            intensity /= Mathf.Pow(mapIntensity, intensityNormExp);
             intensity = (float)Math.Tanh(intensityWeight * intensity);
             float span = end - start;
             if (span > 480f)
@@ -364,7 +343,7 @@ namespace AuthorableModifiers
             /*BrightnessEvent be = brightnessEvents[0];
             be.brightness = be.previousSectionBrightness;
             brightnessEvents[0] = be;*/
-            while (active)
+            while (Active)
             {
                 if (psyEvents.Count > 0)
                 {
@@ -379,7 +358,7 @@ namespace AuthorableModifiers
                 if (brightnessEvents.Count == 0) yield break;
                 if (brightnessEvents[0].startTick <= AudioDriver.I.mCachedTick)
                 {
-                    if (!pulseMode)
+                    if (!PulseMode)
                     {
                         MelonCoroutines.Stop(faderToken);
                         faderToken = MelonCoroutines.Start(BetterFade(brightnessEvents[0].startTick, brightnessEvents[0].endTick, brightnessEvents[0].brightness));
@@ -397,7 +376,7 @@ namespace AuthorableModifiers
                     }
                     brightnessEvents.RemoveAt(0);
                 }
-                yield return new WaitForSecondsRealtime(.02f);
+                yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }
         }
 
@@ -427,7 +406,28 @@ namespace AuthorableModifiers
                 default:
                     break;
             }
-            if (behavior == Target.TargetBehavior.Melee && hitsound != Hitsound.Melee) amount = (maxBrightness / 100f) * 80f;
+            if (behavior == Target.TargetBehavior.Melee)
+            {
+                if (hitsound != Hitsound.Melee)
+                {
+                    if (hitsound == Hitsound.Snare)
+                    {
+                        amount = (maxBrightness / 100f) * 60f;
+                    }
+                    else
+                    {
+                        amount = (maxBrightness / 100f) * 5f;
+                    }
+                }
+            }
+            else
+            {
+                if (hitsound == Hitsound.Melee)
+                {
+                    amount = 0f;
+                }
+            }
+            //if (behavior == Target.TargetBehavior.Melee && hitsound == Hitsound.Snare) amount = (maxBrightness / 100f) * 80f;
             return amount * Config.intensity * .5f;
         }
 
@@ -487,8 +487,8 @@ namespace AuthorableModifiers
                 percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
                 float currentExp = Mathf.Lerp(oldExposure, targetExposure, percentage / 100f);
                 float currentRef = Mathf.Lerp(oldReflection, targetReflection, percentage / 100f);
-                currentExp = Mathf.Clamp(currentExp, 0, originalMaxBrightness);
-                currentRef = Mathf.Clamp(currentRef, .5f, originalMaxBrightness);
+                currentExp = Mathf.Clamp(currentExp, 0, OriginalMaxBrightness);
+                currentRef = Mathf.Clamp(currentRef, .5f, OriginalMaxBrightness);
                 /*if (currentExp > originalMaxBrightness) currentExp = originalMaxBrightness;               
                 else if (currentExp < 0f) currentExp = 0f;
                 if (currentRef < .5f) currentRef = .5f;
@@ -497,7 +497,8 @@ namespace AuthorableModifiers
                 ArenaLoaderMod.CurrentSkyboxReflection = 0f;
                 ArenaLoaderMod.ChangeReflectionStrength(currentRef);
                 ArenaLoaderMod.CurrentSkyboxExposure = currentExp;
-                yield return new WaitForSecondsRealtime(.01f);
+                ApiController.SetBrightness(currentExp);
+                yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }
             /*RenderSettings.skybox.SetFloat("_Exposure", targetExposure);
             ArenaLoaderMod.CurrentSkyboxReflection = 0f;
@@ -518,21 +519,22 @@ namespace AuthorableModifiers
                 {
                     float currentExp = Mathf.Lerp(fadeToBlackExposure, 0f, percentage / 100f);
                     float currentRef = Mathf.Lerp(fadeToBlackReflection, .5f, percentage / 100f);
-                    currentExp = Mathf.Clamp(currentExp, 0, originalMaxBrightness);
-                    currentRef = Mathf.Clamp(currentRef, .5f, originalMaxBrightness);
+                    currentExp = Mathf.Clamp(currentExp, 0, OriginalMaxBrightness);
+                    currentRef = Mathf.Clamp(currentRef, .5f, OriginalMaxBrightness);
                     RenderSettings.skybox.SetFloat("_Exposure", currentExp);
                     ArenaLoaderMod.CurrentSkyboxReflection = 0f;
                     ArenaLoaderMod.ChangeReflectionStrength(currentRef);
                     ArenaLoaderMod.CurrentSkyboxExposure = currentExp;
+                    ApiController.SetBrightness(currentExp);               
                 }
-                yield return new WaitForSecondsRealtime(.01f);
+                yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }
         }
 
         private IEnumerator DoPsychedelia(float start, float end)
         {
             psychadeliaTimer = lastPsyTimer;
-            while (active)
+            while (Active)
             {
                 float amount = SongDataHolder.I.songData.GetTempo(start) / 50f;
                 float phaseTime = defaultPsychadeliaPhaseSeconds / amount;
@@ -556,7 +558,7 @@ namespace AuthorableModifiers
                     yield break;
                 }
 
-                yield return new WaitForSecondsRealtime(0.02f);
+                yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }
         }
 

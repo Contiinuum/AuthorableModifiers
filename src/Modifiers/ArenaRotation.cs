@@ -13,60 +13,61 @@ namespace AuthorableModifiers
     
     public class ArenaRotation : Modifier
     {
-        public bool continuous;
-        public bool incremental;
-        public ArenaRotation(ModifierType _type, float _startTick, float _endTick, float _amount, bool _continuous, bool _incremental)
+        public bool Continuous { get; set; }
+        public bool Incremental { get; set; }
+        /*public ArenaRotation(ModifierType _type, float _startTick, float _endTick, float _amount, bool _continuous, bool _incremental)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
-            amount = _amount;
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
+            Amount = _amount;
             continuous = _continuous;
             incremental = _incremental;
-        }
+        }*/
 
         public override void Activate()
         {
+            if (!IsSingleUse) Amount /= 100f;
             base.Activate();
 
-            if (incremental)
+            if (Incremental)
             {
-                amount *= 2f;
+                Amount *= 2f;
                 MelonCoroutines.Start(DoRotationIncremental());
             }
-            if (continuous)
+            if (Continuous)
             {
                 MelonCoroutines.Start(DoRotation());
             }
             else
             {
-                ArenaLoaderMod.RotateSkybox(amount);
+                ArenaLoaderMod.RotateSkybox(Amount);
             }
            
         }
 
         private IEnumerator DoRotationIncremental()
         {
-            float oldRotation = RenderSettings.skybox.GetFloat("_Rotation");
+            //float oldRotation = RenderSettings.skybox.GetFloat("_Rotation");
             float startTick = AudioDriver.I.mCachedTick;
-            while (active)
+            while (Active)
             {
                
-                float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
-                float currentRot = Mathf.Lerp(0f, amount, percentage / 100f);
+                float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (EndTick - startTick);
+                float currentRot = Mathf.Lerp(0f, Amount, percentage / 100f);
                 //RenderSettings.skybox.SetFloat("_Rotation", currentRot);
                 ArenaLoaderMod.RotateSkybox(currentRot);
-                yield return new WaitForSecondsRealtime(.01f);
+                yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }
             yield return null;
         }
 
         private IEnumerator DoRotation()
         {
-            while (active)
+            while (Active)
             {
-                ArenaLoaderMod.RotateSkybox(amount);
-                yield return new WaitForSecondsRealtime(.01f);
+                ArenaLoaderMod.RotateSkybox(Amount);
+                yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }
             yield return null;
         }

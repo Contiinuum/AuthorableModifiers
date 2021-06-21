@@ -9,18 +9,18 @@ namespace AuthorableModifiers
 {
     public class AimAssistChange : Modifier
     {
-        public AimAssistChange(ModifierType _type, float _startTick, float _endTick, float _amount)
+        /*public AimAssistChange(ModifierType _type, float _startTick, float _endTick, float _amount)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
-            amount = _amount;
-        }
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
+            Amount = _amount;
+        }*/
 
         public override void Activate()
         {           
             base.Activate();
-            PlayerPreferences.I.AimAssistAmount.mVal = amount;       
+            PlayerPreferences.I.AimAssistAmount.mVal = Amount;       
         }
 
         public override void Deactivate()

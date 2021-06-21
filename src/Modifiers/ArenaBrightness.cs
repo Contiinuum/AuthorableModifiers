@@ -13,29 +13,29 @@ namespace AuthorableModifiers
     public class ArenaBrightness : Modifier
     {
 
-        public bool continuous;
-        public bool strobo;
-        public ArenaBrightness(ModifierType _type, float _startTick, float _endTick, float _amount, bool _continuous, bool _strobo)
+        public bool Continuous { get; set; }
+        public bool Strobo { get; set; }
+        /*public ArenaBrightness(ModifierType _type, float _startTick, float _endTick, float _amount, bool _continuous, bool _strobo)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
-            amount = _amount;
-            continuous = _continuous;
-            strobo = _strobo;
-        }
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
+            Amount = _amount;
+            Continuous = _continuous;
+            Strobo = _strobo;
+        }*/
 
         public override void Activate()
         {
             base.Activate();
-            if (!continuous) amount *= Config.intensity;
+            if (!Continuous) Amount *= Config.intensity;
 
-            if (strobo)
+            if (Strobo)
             {
                 //if (amount == 0f) amount = maxBrightness * Config.intensity;
                 MelonCoroutines.Start(DoStrobo());
             }
-            else if (continuous)
+            else if (Continuous)
             {
                 MelonCoroutines.Start(ExposureChangeContinuous());
             }
@@ -43,7 +43,7 @@ namespace AuthorableModifiers
             {
                 ArenaLoaderMod.CurrentSkyboxExposure = 0f;
                 float newExposure = AuthorableModifiersMod.defaultArenaBrightness / 100f;
-                newExposure *= amount;
+                newExposure *= Amount;
                 //if (amount < minBrightness) amount = minBrightness;
                 ArenaLoaderMod.ChangeExposure(newExposure);
                 ArenaLoaderMod.CurrentSkyboxReflection = 0f;
@@ -58,9 +58,9 @@ namespace AuthorableModifiers
         {
             float dir = 1;
             if (AuthorableModifiersMod.defaultArenaBrightness / RenderSettings.skybox.GetFloat("_Exposure") >= .5f) dir = 0;          
-            float interval = (480f / amount);
-            float nextStrobe = startTick;
-            while (active)
+            float interval = (480f / Amount);
+            float nextStrobe = StartTick;
+            while (Active)
             {
                 if(nextStrobe <= AudioDriver.I.mCachedTick)
                 {
@@ -87,16 +87,16 @@ namespace AuthorableModifiers
         {
             float dir = 1;
             float newAmount = AuthorableModifiersMod.defaultArenaBrightness / 1000f;
-            newAmount *= amount;
+            newAmount *= Amount;
             if (ArenaLoaderMod.CurrentSkyboxExposure > AuthorableModifiersMod.defaultArenaBrightness) ArenaLoaderMod.CurrentSkyboxExposure = AuthorableModifiersMod.defaultArenaBrightness;
-            while (active)
+            while (Active)
             {
                 if (ArenaLoaderMod.CurrentSkyboxExposure >= AuthorableModifiersMod.defaultArenaBrightness) dir = -1;
                 else if (ArenaLoaderMod.CurrentSkyboxExposure <= 0f) dir = 1;
                 ArenaLoaderMod.ChangeExposure(newAmount * dir);
                 ArenaLoaderMod.ChangeReflectionStrength(newAmount * dir);
                 
-                yield return new WaitForSecondsRealtime(.01f);
+                yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }
             yield return null;
         }

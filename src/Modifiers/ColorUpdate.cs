@@ -9,21 +9,21 @@ namespace AuthorableModifiers
 {
     public class ColorUpdate : Modifier
     {
-        private Color leftHandColor;
-        private Color rightHandColor;
-        public ColorUpdate(ModifierType _type, float _startTick, float[] _leftHandColor, float[] _rightHandColor)
+        public Color LeftHandColor { get; set; }
+        public Color RightHandColor { get; set; }
+        /*public ColorUpdate(ModifierType _type, float _startTick, float[] _leftHandColor, float[] _rightHandColor)
         {
-            type = _type;
-            startTick = _startTick;
-            leftHandColor = new Color(_leftHandColor[0], _leftHandColor[1], _leftHandColor[2]);
-            rightHandColor = new Color(_rightHandColor[0], _rightHandColor[1], _rightHandColor[2]);
-            isSingleUseModule = true;
-        }
+            Type = _type;
+            StartTick = _startTick;
+            LeftHandColor = new Color(_leftHandColor[0], _leftHandColor[1], _leftHandColor[2]);
+            RightHandColor = new Color(_rightHandColor[0], _rightHandColor[1], _rightHandColor[2]);
+            IsSingleUse = true;
+        }*/
 
         public override void Activate()
         {
             base.Activate();
-            if (AuthorableModifiersMod.activeColorChange != null) AuthorableModifiersMod.activeColorChange.UpdateColors(leftHandColor, rightHandColor);
+            if (AuthorableModifiersMod.activeColorChange != null) AuthorableModifiersMod.activeColorChange.UpdateColors(LeftHandColor, RightHandColor);
         }
 
         public override void Deactivate()

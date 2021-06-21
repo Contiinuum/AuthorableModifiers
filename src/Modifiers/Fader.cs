@@ -12,19 +12,20 @@ namespace AuthorableModifiers
     public class Fader : Modifier
     {
 
-        public Fader(ModifierType _type, float _startTick, float _endTick, float _amount)
+        /*public Fader(ModifierType _type, float _startTick, float _endTick, float _amount)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
-            amount = _amount;
-        }
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
+            Amount = _amount;
+        }*/
 
         public override void Activate()
         {
             base.Activate();
 
-            if (amount > AuthorableModifiersMod.defaultArenaBrightness) amount = AuthorableModifiersMod.defaultArenaBrightness;
+            if (Amount > AuthorableModifiersMod.defaultArenaBrightness) Amount = AuthorableModifiersMod.defaultArenaBrightness;
+            Amount *= Config.intensity;
             MelonCoroutines.Start(Fade());
 
         }
@@ -35,12 +36,12 @@ namespace AuthorableModifiers
             float oldReflection = RenderSettings.reflectionIntensity;
             ArenaLoaderMod.CurrentSkyboxExposure = oldExposure;
             float startTick = AudioDriver.I.mCachedTick;
-            while (active)
+            while (Active)
             {
-                float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (endTick - startTick);
-                float currentExp = Mathf.Lerp(oldExposure, amount, percentage / 100f);
+                float percentage = ((AudioDriver.I.mCachedTick - startTick) * 100f) / (EndTick - startTick);
+                float currentExp = Mathf.Lerp(oldExposure, Amount, percentage / 100f);
                 //float targetReflection = amount / AuthorableModifiersMod.defaultArenaBrightness;
-                float targetReflection = .5f + (amount * .5f);
+                float targetReflection = .5f + (Amount * .5f);
                 //targetReflection = .5f + (amount * targetReflection);
                 float currentReflection = Mathf.Lerp(oldReflection, targetReflection, percentage / 100f);
                 RenderSettings.skybox.SetFloat("_Exposure", currentExp);
@@ -56,8 +57,8 @@ namespace AuthorableModifiers
         public override void Deactivate()
         {
             base.Deactivate();
-            RenderSettings.skybox.SetFloat("_Exposure", amount);
-            RenderSettings.reflectionIntensity = .5f + (.5f * amount);            
+            RenderSettings.skybox.SetFloat("_Exposure", Amount * Config.intensity);
+            RenderSettings.reflectionIntensity = .5f + (.5f * Amount);            
         }
     }
 }

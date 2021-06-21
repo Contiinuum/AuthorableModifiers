@@ -10,37 +10,40 @@ namespace AuthorableModifiers
 {
     public class TextPopup : Modifier
     {
-        private string text;
-        private float size;
-        private bool glow;
-        private bool faceForward;
+        private readonly string text;
+        private readonly float size;
+        private readonly bool glow;
+        private readonly bool faceForward;
         private Vector3 modifierTextPosition = new Vector3(0f, 4f, 25f);
         public TextPopup(ModifierType _type = ModifierType.TextPopup, float _startTick = 0, float _endTick = 0, string _text = "", float _size = 12, float _xoff = 0, float _yoff = 0, float _zoff = 0, bool _glow = false, bool _faceForward = false)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
             text = _text;
             size = _size;
             glow = _glow;
             faceForward = _faceForward;
-
             modifierTextPosition.x += _xoff;
             modifierTextPosition.y += _yoff;
             modifierTextPosition.z += _zoff;
+        }
+        public void SetOffset(Vector3 offset)
+        {
+            modifierTextPosition += offset;
         }
 
         public override void Activate()
         {
             base.Activate();
-            AuthorableModifiersMod.DebugTextPopup(text, size, modifierTextPosition, glow, faceForward, startTick);
+            AuthorableModifiersMod.DebugTextPopup(text, size, modifierTextPosition, glow, faceForward, StartTick);
             
         }
 
         public override void Deactivate()
         {
             base.Deactivate();
-            AuthorableModifiersMod.DestroyPopup(startTick);            
+            AuthorableModifiersMod.DestroyPopup(StartTick);            
         }
 
 

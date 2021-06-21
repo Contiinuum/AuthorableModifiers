@@ -28,6 +28,7 @@ namespace AuthorableModifiers
         AutoLighting,
         ArenaScale,
         ArenaPosition,
-        ArenaSpin
+        ArenaSpin,
+        SkyboxColor
     }
 }

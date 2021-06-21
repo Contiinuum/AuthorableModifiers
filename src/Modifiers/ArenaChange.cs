@@ -14,23 +14,23 @@ namespace AuthorableModifiers
     public class ArenaChange : Modifier
     {
         public string oldArena;
-        public List<string> options = new List<string>();
-        public bool preload;
-        public ArenaChange(ModifierType _type, float _startTick, string _option1, string _option2 , bool _preload)
+        public List<string> ArenaOptions { get; set; } = new List<string>();
+        public bool Preload { get; set; }
+        /*public ArenaChange(ModifierType _type, float _startTick, string _option1, string _option2 , bool _preload)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = 0f;
-            preload = _preload;
-            if (_option1 != "") options.Add(_option1);
-            if (_option2 != "") options.Add(_option2);           
-        }
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = 0f;
+            Preload = _preload;
+            if (_option1 != "") ArenaOptions.Add(_option1);
+            if (_option2 != "") ArenaOptions.Add(_option2);           
+        }*/
 
         public override void Activate()
         {
             base.Activate();           
             oldArena = PlayerPreferences.I.Environment.Get();
-            foreach (string option in options)
+            foreach (string option in ArenaOptions)
             {
                 if (ChangeArena(option))
                 {

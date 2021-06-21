@@ -10,20 +10,20 @@ namespace AuthorableModifiers
 {
     public class ColorChange : Modifier
     {
-        public Color leftHandColor;
-        public Color rightHandColor;
+        public Color LeftHandColor { get; set; }
+        public Color RightHandColor { get; set; }
 
         private Color oldLeftHandColor;
         private Color oldRightHandColor;
 
-        public ColorChange(ModifierType _type, float _startTick, float _endTick, float[] _leftHandColor, float[] _rightHandColor)
+        /*public ColorChange(ModifierType _type, float _startTick, float _endTick, float[] _leftHandColor, float[] _rightHandColor)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
-            leftHandColor = new Color(_leftHandColor[0], _leftHandColor[1], _leftHandColor[2]);
-            rightHandColor = new Color(_rightHandColor[0], _rightHandColor[1], _rightHandColor[2]);
-        }
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
+            LeftHandColor = new Color(_leftHandColor[0], _leftHandColor[1], _leftHandColor[2]);
+            RightHandColor = new Color(_rightHandColor[0], _rightHandColor[1], _rightHandColor[2]);
+        }*/
 
         public override void Activate()
         {
@@ -50,8 +50,8 @@ namespace AuthorableModifiers
                 oldRightHandColor = KataConfig.I.rightHandColor;
                 AuthorableModifiersMod.SetOldColors(oldLeftHandColor, oldRightHandColor);
 
-                lhColor = leftHandColor;
-                rhColor = rightHandColor;
+                lhColor = LeftHandColor;
+                rhColor = RightHandColor;
             }
             else
             {

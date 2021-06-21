@@ -14,7 +14,7 @@ namespace AuthorableModifiers
         public float transitionNumberOfTargets;
         private bool endTickSet;
 
-        public ZOffset(ModifierType _type, float _startTick, float _endTick, float _amount, float _transitionNumberOfTargets)
+        /*public ZOffset(ModifierType _type, float _startTick, float _endTick, float _amount, float _transitionNumberOfTargets)
         {
             type = _type;
             startTick = _startTick;
@@ -22,12 +22,13 @@ namespace AuthorableModifiers
             amount = _amount;
             transitionNumberOfTargets = _transitionNumberOfTargets;
             endTickSet = _endTick != 0 && _startTick != _endTick;
-        }
+        }*/
 
         public override void Activate()
         {
+            endTickSet = EndTick != 0 && StartTick != EndTick;
             base.Activate();
-            SetZOffset(amount);
+            SetZOffset(Amount);
         }
 
         public override void Deactivate()
@@ -43,8 +44,8 @@ namespace AuthorableModifiers
             float currentCount = 1f;
             for (int i = 0; i < songCues.Length; i++)
             {
-                if (songCues[i].tick < startTick) continue;
-                if (songCues[i].tick > endTick && endTickSet) break;
+                if (songCues[i].tick < StartTick) continue;
+                if (songCues[i].tick > EndTick && endTickSet) break;
                 if (songCues[i].behavior != Target.TargetBehavior.Melee && songCues[i].behavior != Target.TargetBehavior.Dodge)
                 {
                     if (transitionNumberOfTargets > 0)

@@ -8,21 +8,21 @@ namespace AuthorableModifiers
 {
     public class PsychedeliaUpdate : Modifier
     {
-
+        /*
         public PsychedeliaUpdate(ModifierType _type, float _startTick, float _amount)
         {
-            type = _type;
-            startTick = _startTick;
-            amount = _amount;
-            isSingleUseModule = true;
+            Type = _type;
+            StartTick = _startTick;
+            Amount = _amount;
+            IsSingleUse = true;
         }
-
+        */
         public override void Activate()
         {
-            amount /= 50f;
+            Amount /= 50f;
             base.Activate();
             if (AuthorableModifiersMod.activePsychedelia is null) return;
-            AuthorableModifiersMod.activePsychedelia.amount = amount;
+            AuthorableModifiersMod.activePsychedelia.Amount = Amount;
         }
 
         public override void Deactivate()

@@ -14,23 +14,23 @@ namespace AuthorableModifiers
     public class OverlaySetter : Modifier
     {
 
-        public string mapper;
-        public string songInfo;
+        public string Mapper { get; set; }
+        public string SongInfo { get; set; }
 
-        public OverlaySetter(ModifierType _type, float _startTick, float _endTick, string _value1, string _value2)
+        /*public OverlaySetter(ModifierType _type, float _startTick, float _endTick, string _value1, string _value2)
         {
-            type = _type;
-            startTick = _startTick;
-            endTick = _endTick;
-            songInfo = _value1;
-            mapper = _value2;
-        }
+            Type = _type;
+            StartTick = _startTick;
+            EndTick = _endTick;
+            SongInfo = _value1;
+            Mapper = _value2;
+        }*/
 
         public override void Activate()
         {           
             base.Activate();
-            if (songInfo.Length > 0) ScoreOverlayMod.ui.songInfo.text = songInfo;
-            if (mapper.Length > 0) ScoreOverlayMod.ui.mapperInfo.text = mapper;
+            if (SongInfo.Length > 0) ScoreOverlayMod.ui.songInfo.text = SongInfo;
+            if (Mapper.Length > 0) ScoreOverlayMod.ui.mapperInfo.text = Mapper;
         }
 
         public override void Deactivate()

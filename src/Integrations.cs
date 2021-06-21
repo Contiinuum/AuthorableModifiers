@@ -25,12 +25,12 @@ namespace AuthorableModifiers
                     if (result > 0)
                     {
                         arenaLoaderFound = true;
-                        MelonLogger.Log("Arena Loader found");
+                        MelonLogger.Msg("Arena Loader found");
 
                     }
                     else
                     {
-                        MelonLogger.LogWarning("Arena Loader version not compatible. Update Arena Loader to use it with Authorable Modifiers.");
+                        MelonLogger.Warning("Arena Loader version not compatible. Update Arena Loader to use it with Authorable Modifiers.");
                         arenaLoaderFound = false;
                     }
                 }      
@@ -42,12 +42,12 @@ namespace AuthorableModifiers
                     if (result > 0)
                     {
                         scoreOverlayFound = true;
-                        MelonLogger.Log("Score Overlay found");
+                        MelonLogger.Msg("Score Overlay found");
 
                     }
                     else
                     {
-                        MelonLogger.LogWarning("Score Overlay version not compatible. Update Score Overlay to use it with Authorable modifiers.");
+                        MelonLogger.Warning("Score Overlay version not compatible. Update Score Overlay to use it with Authorable modifiers.");
                         scoreOverlayFound = false;
                     }
                 }
@@ -59,11 +59,11 @@ namespace AuthorableModifiers
                     if (result > 0)
                     {
                         autoLightshowFound = true;
-                        MelonLogger.Log("Auto Lightshow found");
+                        MelonLogger.Msg("Auto Lightshow found");
                     }
                     else
                     {
-                        MelonLogger.LogWarning("Auto Lightshow version not compatible. Update Auto Lightshow to use it with Authorable modifiers.");
+                        MelonLogger.Warning("Auto Lightshow version not compatible. Update Auto Lightshow to use it with Authorable modifiers.");
                         autoLightshowFound = false;
                     }
                 }
@@ -75,11 +75,11 @@ namespace AuthorableModifiers
                     if (result > 0)
                     {
                         songBrowserFound = true;
-                        MelonLogger.Log("Song Browser");
+                        MelonLogger.Msg("Song Browser");
                     }
                     else
                     {
-                        MelonLogger.LogWarning("Song Browser version not compatible. Update Song Browser to use it with Authorable modifiers.");
+                        MelonLogger.Warning("Song Browser version not compatible. Update Song Browser to use it with Authorable modifiers.");
                         songBrowserFound = false;
                     }
                 }

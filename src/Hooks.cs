@@ -1,4 +1,4 @@
-using Harmony;
+using HarmonyLib;
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -12,6 +12,7 @@ namespace AuthorableModifiers
         public static bool updateChainColor = false;
         public static bool hideTeles = false;
 
+#pragma warning disable IDE0051, IDE0060
 
         [HarmonyPatch(typeof(Target), "InitFromSpawner", new Type[] { typeof(TargetSpawner.SpawnInfo), typeof(SongCues.Cue) })]
         private static class PatchTargetInit
@@ -57,7 +58,7 @@ namespace AuthorableModifiers
                 if (AuthorableModifiersMod.endless) return;
                 AuthorableModifiersMod.audicaFilePath = __instance.mSongData.foundPath;
                 AuthorableModifiersMod.LoadModifierCues();
-                //MelonLoader.MelonLogger.Log(__result.zipPath);
+                //MelonLoader.MelonLogger.Msg(__result.zipPath);
             }
         }
 
@@ -91,7 +92,7 @@ namespace AuthorableModifiers
                 //Set filePath
                 AuthorableModifiersMod.SetEndlessActive(false);
                 AuthorableModifiersMod.Reset(true);
-                //MelonLoader.MelonLogger.Log(__result.zipPath);
+                //MelonLoader.MelonLogger.Msg(__result.zipPath);
             }
         }
 

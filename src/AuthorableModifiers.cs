@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using MelonLoader;
 using UnityEngine;
-using Harmony;
 using System.Linq;
 using System.Collections;
 using ArenaLoader;
@@ -59,14 +58,13 @@ namespace AuthorableModifiers
 
         public override void OnApplicationStart()
         {
-            HarmonyInstance instance = HarmonyInstance.Create("AuthorableModifiers");
             Config.RegisterConfig();
             Integrations.LookForIntegrations();
         }
 
-        public override void OnModSettingsApplied()
+        public override void OnPreferencesSaved()
         {
-            Config.OnModSettingsApplied();
+            Config.OnPreferencesSaved();
         }
 
         public static IEnumerator ISetDefaultArenaBrightness()
@@ -85,12 +83,12 @@ namespace AuthorableModifiers
         {
             if (!Config.enabled) return;
             SetOldOffsets();
-            zOffsetList.Sort((z1, z2) => z1.startTick.CompareTo(z2.startTick));
+            zOffsetList.Sort((z1, z2) => z1.StartTick.CompareTo(z2.StartTick));
             foreach(Modifier m in zOffsetList)
             {
                 m.Activate();
             }
-            autoLightings.Sort((a1, a2) => a1.startTick.CompareTo(a2.startTick));
+            autoLightings.Sort((a1, a2) => a1.StartTick.CompareTo(a2.StartTick));
             foreach (AutoLighting al in autoLightings)
             {
                 al.Preload();
@@ -109,17 +107,16 @@ namespace AuthorableModifiers
             Reset();
             if (audicaFilePath.Length == 0)
             {
-                MelonLogger.Log("Audica file path not found.");
+                MelonLogger.Msg("Audica file path not found.");
                 modifiersFound = false;
                 modifiersLoaded = true;
                 return;
             }
-            MelonLogger.LogWarning(audicaFilePath);
             awaitEnableModifiers = Decoder.GetModifierCues(audicaFilePath);
 
             if (awaitEnableModifiers is null || (awaitEnableModifiers.Count == 0 && preloadModifiers.Count == 0 && zOffsetList.Count == 0))
             {
-                //MelonLogger.Log("Couldn't load data in modifierCues.json. Please check if there are any typos present.");
+                //MelonLogger.Msg("Couldn't load data in modifierCues.json. Please check if there are any typos present.");
                 modifiersFound = false;
                 modifiersLoaded = true;
                 if (endless)
@@ -138,7 +135,7 @@ namespace AuthorableModifiers
             {
                 if (endless && !arenaChanged)
                 {
-                    if (m.type == ModifierType.ArenaChange) arenaChanged = true;
+                    if (m.Type == ModifierType.ArenaChange) arenaChanged = true;
                 }
                 m.Activate();
             }
@@ -148,10 +145,10 @@ namespace AuthorableModifiers
             }
             foreach(Modifier m in awaitEnableModifiers)
             {
-                modifierQueue.Add(new ModifierQueueItem(m, m.startTick, Action.Activate));
-                if (!m.isSingleUseModule) modifierQueue.Add(new ModifierQueueItem(m, m.endTick, Action.Deactivate));
+                modifierQueue.Add(new ModifierQueueItem(m, m.StartTick, Action.Activate));
+                if (!m.IsSingleUse) modifierQueue.Add(new ModifierQueueItem(m, m.EndTick, Action.Deactivate));
             }
-            MelonLogger.Log("Modifiers loaded.");
+            MelonLogger.Msg("Modifiers loaded.");
             //awaitEnableModifiers.Sort((mod1, mod2) => mod1.startTick.CompareTo(mod2.startTick));
             modifierQueue.Sort((mod1, mod2) => (mod1.tick - (int)mod1.action).CompareTo((mod2.tick - (int)mod2.action)));
             modifiersFound = true;
@@ -176,7 +173,7 @@ namespace AuthorableModifiers
         {
             if (Integrations.autoLightshowFound)
             {
-                if (AutoLightshowMod.isEnabled)
+                if (AutoLightshowMod.IsEnabled)
                 {
                     if (!enable) lightshowWasEnabled = true;
                 }
@@ -308,26 +305,26 @@ namespace AuthorableModifiers
             {
                 foreach (Modifier mod in awaitDisableModifiers)
                 {
-                    if(mod.type != ModifierType.ColorChange && mod.type != ModifierType.ColorUpdate)
+                    if(mod.Type != ModifierType.ColorChange && mod.Type != ModifierType.ColorUpdate)
                         mod.Deactivate();
                 }
                    
                 foreach (Modifier mod in preloadModifiers) mod.Deactivate();
                 foreach (Modifier mod in singleUseModifiers)
                 {
-                    if (mod.type != ModifierType.ColorChange && mod.type != ModifierType.ColorUpdate)
+                    if (mod.Type != ModifierType.ColorChange && mod.Type != ModifierType.ColorUpdate)
                         mod.Deactivate();
                 }
-        
                 foreach (ModifierQueueItem item in modifierQueue)
                 {
-                    if (item.modifier.type != ModifierType.ColorChange && item.modifier.type != ModifierType.ColorUpdate)
+                    if (item.modifier.Type != ModifierType.ColorChange && item.modifier.Type != ModifierType.ColorUpdate)
                         item.modifier.Deactivate();
                 }
 
                 if (oldColorsSet)
                 {
-                    new ColorChange(ModifierType.ColorChange, 0, 0, new float[] { 0f, 0f, 0f }, new float[] { 0f, 0f, 0f }).UpdateColors(oldLeftHandColor, oldRightHandColor);
+                    //new ColorChange(ModifierType.ColorChange, 0, 0, new float[] { 0f, 0f, 0f }, new float[] { 0f, 0f, 0f }).UpdateColors(oldLeftHandColor, oldRightHandColor);
+                    new ColorChange() { }.UpdateColors(oldLeftHandColor, oldRightHandColor);
                 }
             }
             
@@ -354,6 +351,10 @@ namespace AuthorableModifiers
 
         private static void ResetArena(bool forceReset = false)
         {
+            RenderSettings.skybox.SetColor("_Tint", new Color(1f, 1f, 1f, 1f));
+            ApiController.TurnOff();
+            SkyboxControl skyboxControl = GameObject.FindObjectOfType<SkyboxControl>();
+            if (skyboxControl != null) skyboxControl.enabled = true;
             if (Integrations.arenaLoaderFound)
             {
                 if (oldArena.Length > 0 && oldArenaSet)
@@ -393,8 +394,14 @@ namespace AuthorableModifiers
         {
             /*if (Input.GetKeyDown(KeyCode.L))
             {
+                ApiController.isRunning = true;
+                MelonCoroutines.Start(ApiController.StartPost());
+                //ApiController.PostAsync(255, 255, 255, 255);
+            }*/
+           /*if (Input.GetKeyDown(KeyCode.L))
+            {
                 AutoPlayer.EnableAutoplayer(!AutoPlayer.I.IsAutoPlayerEnabled);
-                MelonLogger.Log("Auto player is " + (AutoPlayer.I.IsAutoPlayerEnabled ? "enabled" : "disabled"));                
+                MelonLogger.Msg("Auto player is " + (AutoPlayer.I.IsAutoPlayerEnabled ? "enabled" : "disabled"));                
                 
             }
             if (Input.GetKeyDown(KeyCode.P) && MenuState.sState == MenuState.State.Launched)
