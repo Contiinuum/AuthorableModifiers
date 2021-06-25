@@ -24,7 +24,7 @@ namespace AuthorableModifiers
             {
                 HttpClient client = new HttpClient();
                 await client.PostAsync(
-                "http://192.168.1.76/led",
+                Config.apiUrl,
                 new StringContent(json, Encoding.UTF8, "application/json"));                              
             }
             catch(HttpRequestException ex)

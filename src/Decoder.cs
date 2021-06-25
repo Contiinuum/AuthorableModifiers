@@ -435,12 +435,16 @@ namespace AuthorableModifiers
                                     case ModifierType.SkyboxColor:
                                         if (!Config.enableSkyboxColorChange) continue;
                                         modifierCue = new SkyboxColor(type,
-                                            modifiersJSON["modifiers"][i]["startTick"],
-                                            modifiersJSON["modifiers"][i]["endTick"],
-                                            modifiersJSON["modifiers"][i]["leftHandColor"][0],
-                                            modifiersJSON["modifiers"][i]["leftHandColor"][1],
-                                            modifiersJSON["modifiers"][i]["leftHandColor"][2],
-                                            modifiersJSON["modifiers"][i]["option2"]);
+                                            startTick,
+                                            endTick,
+                                            leftHandColor.r,
+                                            leftHandColor.g,
+                                            leftHandColor.b,
+                                            option2);
+                                        if(startTick == endTick || endTick == 0)
+                                        {
+                                            modifierCue.IsSingleUse = true;
+                                        }
                                         break;
                                     default:
                                         break;

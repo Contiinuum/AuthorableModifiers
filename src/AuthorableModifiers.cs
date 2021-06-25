@@ -37,8 +37,9 @@ namespace AuthorableModifiers
         public static float userArenaBrightness = .5f;
         public static float userArenaReflection = 1f;
         public static float userArenaRotation = 0f;
-
         public static bool endless = false;
+
+        public static Color defaultSkyboxColor = new Color();
 
         public static Dictionary<float, DebugTextPopup> popupTextDictionary = new Dictionary<float, DebugTextPopup>();
         public static bool lightshowWasEnabled = false;
@@ -167,6 +168,7 @@ namespace AuthorableModifiers
                 yield return new WaitForSecondsRealtime(.2f);
             }
             modifiersLoaded = true;
+            defaultSkyboxColor = RenderSettings.skybox.GetColor("_Tint");
         }
 
         private static void EnableAutoLightshow(bool enable)
@@ -351,7 +353,7 @@ namespace AuthorableModifiers
 
         private static void ResetArena(bool forceReset = false)
         {
-            RenderSettings.skybox.SetColor("_Tint", new Color(1f, 1f, 1f, 1f));
+            RenderSettings.skybox.SetColor("_Tint", defaultSkyboxColor);
             ApiController.TurnOff();
             SkyboxControl skyboxControl = GameObject.FindObjectOfType<SkyboxControl>();
             if (skyboxControl != null) skyboxControl.enabled = true;
@@ -397,8 +399,8 @@ namespace AuthorableModifiers
                 ApiController.isRunning = true;
                 MelonCoroutines.Start(ApiController.StartPost());
                 //ApiController.PostAsync(255, 255, 255, 255);
-            }*/
-           /*if (Input.GetKeyDown(KeyCode.L))
+            }
+           if (Input.GetKeyDown(KeyCode.L))
             {
                 AutoPlayer.EnableAutoplayer(!AutoPlayer.I.IsAutoPlayerEnabled);
                 MelonLogger.Msg("Auto player is " + (AutoPlayer.I.IsAutoPlayerEnabled ? "enabled" : "disabled"));                

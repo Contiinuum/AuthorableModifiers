@@ -20,7 +20,6 @@ namespace AuthorableModifiers
         public static string lightingTitle = "[Header]Lighting Options";
         public static float intensity;
 
-        public static string apiTitle = "[Header]Lights Api Options";
         public static bool postToApi;
         public static string apiUrl;
 
@@ -36,10 +35,9 @@ namespace AuthorableModifiers
             MelonPreferences.CreateEntry(Category, nameof(enableSkyboxColorChange), true, "Allows maps to use Skybox Color Changes.");
             MelonPreferences.CreateEntry(Category, nameof(hideWarning), false, "Hides the warning before starting a song.");
 
-            MelonPreferences.CreateEntry(Category, nameof(lightingTitle), "", lightingTitle);
+            MelonPreferences.CreateEntry(Category, nameof(lightingTitle), "", "[Header]Lighting Options");
             MelonPreferences.CreateEntry(Category, nameof(intensity), 1f, "Controls how intense lighting modifiers are. [0.1, 1, 0.1, 1]{P}");
 
-            MelonPreferences.CreateEntry(Category, nameof(apiTitle), "", apiTitle);
             MelonPreferences.CreateEntry(Category, nameof(postToApi), false, "Posts Brightness and Color data to specified URL in apiUrl");
             MelonPreferences.CreateEntry(Category, nameof(apiUrl), "", apiUrl);
 
