@@ -1,7 +1,7 @@
 # Authorable Modifiers
 Allows Audica custom maps to work with ingame modifiers.
 
-# Api Controller
+## Api Controller
 This allows you to sync Brightness and Colors to LEDs via API.
 In the ML config file [PathToAudica]/UserData/MelonPreferences.cfg are 2 variables you need to set in order to use this.
 ```csharp
