@@ -15,13 +15,13 @@ namespace AuthorableModifiers
         private readonly bool glow;
         private readonly bool faceForward;
         private Vector3 modifierTextPosition = new Vector3(0f, 4f, 25f);
-        public TextPopup(ModifierType _type = ModifierType.TextPopup, float _startTick = 0, float _endTick = 0, string _text = "", float _size = 12, float _xoff = 0, float _yoff = 0, float _zoff = 0, bool _glow = false, bool _faceForward = false)
+        public TextPopup(ModifierType _type = ModifierType.TextPopup, float _startTick = 0, float _endTick = 0, string _text = "", float _size = 20f, float _xoff = 0, float _yoff = 0, float _zoff = 0, bool _glow = false, bool _faceForward = false)
         {
             Type = _type;
             StartTick = _startTick;
             EndTick = _endTick;
             text = _text;
-            if (_size <= 0f) _size = 20f;
+            if (_size == 0f) _size = 20f;
             size = _size;
             glow = _glow;
             faceForward = _faceForward;
