@@ -21,6 +21,7 @@ namespace AuthorableModifiers
             StartTick = _startTick;
             EndTick = _endTick;
             text = _text;
+            if (_size <= 0f) _size = 20f;
             size = _size;
             glow = _glow;
             faceForward = _faceForward;
