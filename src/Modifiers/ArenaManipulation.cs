@@ -23,6 +23,7 @@ namespace AuthorableModifiers
         //private Quaternion currentRotation;
         public bool Preload { get; set; }
         public bool Reset { get; set; }
+        public bool ShortestRoute { get; set; }
         /*protected ArenaManipulation(ModifierType _type, float _startTick, float _endTick, string _amountX, string _amountY, string _amountZ, bool _reset, bool _preload)
         {
             Type = _type;
@@ -48,14 +49,14 @@ namespace AuthorableModifiers
             //MelonLogger.Msg("Target " + Type.ToString() + ": " + targetAmount.x + "/" + targetAmount.y + "/" + targetAmount.z);
             if (Preload)
             {
-                SetAmount(targetAmount);
+                SetAmount(targetAmount, true);
             }
             else
             {
                 base.Activate();
                 if (EndTick == StartTick || EndTick == 0)
                 {
-                    SetAmount(targetAmount);
+                    SetAmount(targetAmount, true);
                 }
                 else
                 {
@@ -140,16 +141,18 @@ namespace AuthorableModifiers
                     targetAmount.z = currentAmount.z;
                 }
 
-                if(Type == ModifierType.ArenaSpin)
-                {
-                    float tickSpan = EndTick - StartTick;
-                    if (Reset) tickSpan = 1;
-                    amountPerTick = new Vector3(Mathf.DeltaAngle(currentAmount.x, targetAmount.x), Mathf.DeltaAngle(currentAmount.y, targetAmount.y), Mathf.DeltaAngle(currentAmount.z, targetAmount.z));
-                    amountPerTick /= tickSpan;
-                    //amountPerTick = (targetAmount - currentAmount) / tickSpan;
-                    //MelonLogger.Msg($"{amountPerTick.x}/{amountPerTick.y}/{amountPerTick.z} over {tickSpan} ticks (Target: {targetAmount.x}/{targetAmount.y}/{targetAmount.z} || Calculated: {amountPerTick.x * tickSpan}/{amountPerTick.y * tickSpan}/{amountPerTick.z * tickSpan})");
-                    lastTick = StartTick;
-                }
+                
+                //if (Type != ModifierType.ArenaScale) targetAmount += currentAmount;
+            }
+            if (Type == ModifierType.ArenaSpin)
+            {
+                float tickSpan = EndTick - StartTick;
+                if (Reset || EndTick == 0 || StartTick == EndTick) tickSpan = 1;
+                //amountPerTick = new Vector3(Mathf.DeltaAngle(currentAmount.x, targetAmount.x), Mathf.DeltaAngle(currentAmount.y, targetAmount.y), Mathf.DeltaAngle(currentAmount.z, targetAmount.z));
+                //amountPerTick /= tickSpan;
+                amountPerTick = (targetAmount - currentAmount) / tickSpan;
+                //MelonLogger.Msg($"{amountPerTick.x}/{amountPerTick.y}/{amountPerTick.z} over {tickSpan} ticks (Target: {targetAmount.x}/{targetAmount.y}/{targetAmount.z} || Calculated: {amountPerTick.x * tickSpan}/{amountPerTick.y * tickSpan}/{amountPerTick.z * tickSpan})");
+                lastTick = StartTick;
             }
         }
         private Vector3 amountPerTick = new Vector3();
@@ -168,6 +171,7 @@ namespace AuthorableModifiers
                 amnt.y = CalculateAmount(currentAmount.y, targetAmount.y, percentage);
                 amnt.z = CalculateAmount(currentAmount.z, targetAmount.z, percentage);
             }*/
+
             amnt.x = CalculateAmount(currentAmount.x, targetAmount.x, percentage);
             amnt.y = CalculateAmount(currentAmount.y, targetAmount.y, percentage);
             amnt.z = CalculateAmount(currentAmount.z, targetAmount.z, percentage);
@@ -194,15 +198,17 @@ namespace AuthorableModifiers
             {
                 float percentage = ((AudioDriver.I.mCachedTick - StartTick) * 100f) / (EndTick - StartTick);
                 percentage /= 100f;
-                SetAmount(GetAmount(percentage));
+                SetAmount(GetAmount(percentage), false, percentage);
+                if(Type == ModifierType.ArenaSpin)
+                {
+                    //world.rotation = Quaternion.Lerp(Quaternion.Euler(currentAmount), Quaternion.Euler(targetAmount), percentage);
+                    
+                }
                 yield return new WaitForSecondsRealtime(Time.unscaledDeltaTime);
             }
             //if (Type == ModifierType.ArenaSpin) SetAmount(targetRotation);
-            SetAmount(targetAmount);
+            SetAmount(targetAmount, true);
         }
-
-
-
 
         private float CalculateAmount(float current, float target, float percentage)
         {
@@ -216,7 +222,7 @@ namespace AuthorableModifiers
             world.transform.rotation = rot;
         }*/
 
-        private void SetAmount(Vector3 _amount)
+        private void SetAmount(Vector3 _amount, bool instant, float percentage = 100f)
         {
             switch (Type)
             {       
@@ -227,9 +233,9 @@ namespace AuthorableModifiers
                     world.transform.localScale = _amount;
                     break;
                 case ModifierType.ArenaSpin:
-                    /*float currentTick = AudioDriver.I.mCachedTick;
+                    float currentTick = AudioDriver.I.mCachedTick;
                     float numTicksPassed = currentTick - lastTick;
-                    lastTick = currentTick;*/
+                    lastTick = currentTick;
 
                     /*world.Rotate(Vector3.right, amountPerTick.x * numTicksPassed);
                     world.Rotate(Vector3.up, amountPerTick.y * numTicksPassed);
@@ -239,14 +245,31 @@ namespace AuthorableModifiers
                     /*world.rotation *= Quaternion.AngleAxis(amountPerTick.x * numTicksPassed, Vector3.right);
                     world.rotation *= Quaternion.AngleAxis(amountPerTick.y * numTicksPassed, Vector3.up);
                     world.rotation *= Quaternion.AngleAxis(amountPerTick.z * numTicksPassed, Vector3.forward);*/
-                    /*
-                    world.transform.rotation *= Quaternion.AngleAxis(_amount.x, Vector3.right);
+
+                    /*world.transform.rotation *= Quaternion.AngleAxis(_amount.x, Vector3.right);
                     world.transform.rotation *= Quaternion.AngleAxis(_amount.y, Vector3.up);
                     world.transform.rotation *= Quaternion.AngleAxis(_amount.z, Vector3.forward);
                     */
+                    /*if (instant) world.rotation = Quaternion.Euler(_amount);
+                    else
+                    {
+                        
+                    }*/
+                    if (Reset && instant) world.rotation = Quaternion.identity;
+                    else
+                    {
+                        if(ShortestRoute) world.rotation = Quaternion.Lerp(Quaternion.Euler(currentAmount), Quaternion.Euler(targetAmount), percentage);
+                        else world.rotation = Quaternion.Euler(_amount);
+                    }
 
-                    //world.eulerAngles = _amount;
-                    world.rotation = Quaternion.Euler(_amount);
+                    
+                        /*world.rotation *= Quaternion.AngleAxis(amountPerTick.x * numTicksPassed, Vector3.right);
+                        world.rotation *= Quaternion.AngleAxis(amountPerTick.y * numTicksPassed, Vector3.up);
+                        world.rotation *= Quaternion.AngleAxis(amountPerTick.z * numTicksPassed, Vector3.forward);*/
+                        
+                    
+                    //world.rotation = Quaternion.Euler(_amount);
+                    //MelonLogger.Msg(world.rotation.x + " " + world.rotation.y + " " + world.rotation.z);
                     //world.localRotation = Quaternion.Euler(_amount);
                     break;
                 default:

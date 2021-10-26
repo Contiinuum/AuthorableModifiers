@@ -418,8 +418,8 @@ namespace AuthorableModifiers
                                             AmountY = yOffset,
                                             AmountZ = zOffset,
                                             Reset = option1,
-                                            Preload = option2
-
+                                            Preload = option2,
+                                            ShortestRoute = independantBool
                                         };
                                         /*modifierCue = new ArenaScale(type,
                                             modifiersJSON["modifiers"][i]["startTick"],
@@ -433,8 +433,9 @@ namespace AuthorableModifiers
                                         preload = option2;
                                         break;
                                     case ModifierType.SkyboxColor:
-                                        if (!Config.enableSkyboxColorChange) continue;
+                                        if (!Config.enableSkyboxColorChange || !Integrations.arenaLoaderFound) continue;
                                         modifierCue = new SkyboxColor(type,
+                                            amount,
                                             startTick,
                                             endTick,
                                             leftHandColor.r,

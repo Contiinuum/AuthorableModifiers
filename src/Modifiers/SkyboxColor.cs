@@ -18,12 +18,17 @@ namespace AuthorableModifiers
         private bool isDefaultEnvironment = false;
         private bool reset;
         private Color defaultColor;
-        public SkyboxColor(ModifierType _type, float _startTick, float _endTick, float r, float g, float b, bool _reset)
+        public SkyboxColor(ModifierType _type, float _amount, float _startTick, float _endTick, float r, float g, float b, bool _reset)
         {
+            if (_amount == 0f) _amount = 1f;
+            Amount = _amount;
             Type = _type;
             StartTick = _startTick;
             EndTick = _endTick;
             reset = _reset;
+            r *= Amount;
+            g *= Amount;
+            b *= Amount;
             targetColor = new Color(r, g, b, defaultColor.a);               
             
             //if (!PlayerPreferences.I.Environment.Get().ToLower().Contains("environment")) targetColor *= .7f;

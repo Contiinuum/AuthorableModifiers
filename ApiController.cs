@@ -16,10 +16,12 @@ namespace AuthorableModifiers
     {
         private static float brightness = RenderSettings.skybox.GetFloat("_Exposure") * 255f;
         private static float red, green, blue = 255f;
+        private static string eventName = "";
         public static bool isRunning = false;
-        public static async void PostAsync(float _red, float _green, float _blue, float _brightness)
+        private static object token = null;
+        public static async void PostAsync(float _red, float _green, float _blue, float _brightness, string _eventName)
         {
-            string json = $"{{\"red\": {_red}, \"green\": {_green}, \"blue\": {_blue}, \"bright\": {_brightness}}}";
+            string json = $"{{\"red\": {_red}, \"green\": {_green}, \"blue\": {_blue}, \"bright\": {_brightness}, \"event\": \"{_eventName}\"}}";
             try
             {
                 HttpClient client = new HttpClient();
@@ -31,14 +33,16 @@ namespace AuthorableModifiers
             {
                 MelonLogger.Msg(ex.InnerException.Message);
             }
-           
         }
 
         public static IEnumerator StartPost()
         {
             while (isRunning)
             {
-                PostAsync(red, green, blue, brightness);
+                if(InGameUI.I.mState != InGameUI.State.PausePage)
+                {
+                    PostAsync(red, green, blue, brightness, eventName);
+                }
                 yield return new WaitForSecondsRealtime(.04f);
             }
         }
@@ -47,7 +51,8 @@ namespace AuthorableModifiers
         {
             isRunning = true;
             brightness = RenderSettings.skybox.GetFloat("_Exposure") * 255f;
-            MelonCoroutines.Start(StartPost());
+            eventName = "";
+            token = MelonCoroutines.Start(StartPost());
         }
 
         public static void SetBrightness(float _brightness)
@@ -72,13 +77,28 @@ namespace AuthorableModifiers
             }
         }
 
+        public static void SetEvent(string _event)
+        {
+            if (!Config.postToApi) return;
+            eventName = _event;
+            if (!isRunning)
+            {
+                Start();
+            }
+        }
+
         public static void TurnOff()
         {
             if (!Config.postToApi) return;
             brightness = 0f;
+            red = 255f;
+            green = 255f;
+            blue = 255;
             red = green = blue = 255f;
+            eventName = "";
             isRunning = false;
-            PostAsync(red, green, blue, brightness);
+            MelonCoroutines.Stop(token);
+            PostAsync(red, green, blue, brightness, eventName);
         }
     }
 }

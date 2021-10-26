@@ -67,7 +67,7 @@ namespace AuthorableModifiers
         {
             private static void Postfix(OptionsMenu __instance, OptionsMenu.Page page)
             {
-                if (page == OptionsMenu.Page.Main)
+                if (page == OptionsMenu.Page.Main && !AuthorableModifiersMod.modifiersFound)
                     AuthorableModifiersMod.SetUserBrightness(RenderSettings.skybox.GetFloat("_Exposure"), RenderSettings.skybox.GetFloat("_Rotation"), RenderSettings.reflectionIntensity);
             }
         }
@@ -79,6 +79,7 @@ namespace AuthorableModifiers
             {
                 if(state == MenuState.State.SongPage)
                 {
+                    
                     AuthorableModifiersMod.SetEndlessActive(false);
                 }
             }

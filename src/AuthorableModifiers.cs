@@ -21,7 +21,7 @@ namespace AuthorableModifiers
         public static List<Modifier> singleUseModifiers = new List<Modifier>();
         public static Dictionary<int, float> oldOffsetDict = new Dictionary<int, float>();
         public static string audicaFilePath = "";
-        public static bool modifiersFound = false;
+        public static bool modifiersFound { get; set; } = false;
 
         public static Vector3 debugTextPosition = new Vector3(0f, 8f, 8f);
 
@@ -43,12 +43,13 @@ namespace AuthorableModifiers
 
         public static Dictionary<float, DebugTextPopup> popupTextDictionary = new Dictionary<float, DebugTextPopup>();
         public static bool lightshowWasEnabled = false;
+        public static Vector3 lastRotationEndValue = Vector3.zero;
         public static class BuildInfo
         {
             public const string Name = "AuthorableModifiers";  // Name of the Mod.  (MUST BE SET)
             public const string Author = "Continuum"; // Author of the Mod.  (Set as null if none)
             public const string Company = null; // Company that made the Mod.  (Set as null if none)
-            public const string Version = "1.2.6"; // Version of the Mod.  (MUST BE SET)
+            public const string Version = "1.2.7"; // Version of the Mod.  (MUST BE SET)
             public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
         }
 
@@ -113,6 +114,7 @@ namespace AuthorableModifiers
                 modifiersLoaded = true;
                 return;
             }
+            if(fromRestart) AudioDriver.I.Pause();
             awaitEnableModifiers = Decoder.GetModifierCues(audicaFilePath);
 
             if (awaitEnableModifiers is null || (awaitEnableModifiers.Count == 0 && preloadModifiers.Count == 0 && zOffsetList.Count == 0))
@@ -124,6 +126,7 @@ namespace AuthorableModifiers
                 {
                     ResetArena(true);
                 }
+                if (fromRestart) AudioDriver.I.Resume();
                 return;
             }
             SetOldColors(KataConfig.I.leftHandColor, KataConfig.I.rightHandColor);
@@ -157,11 +160,12 @@ namespace AuthorableModifiers
                 MelonCoroutines.Start(IWaitForArenaLoad("<color=\"red\">WARNING</color>\nMay contain flashing lights and rotating arenas. \nThis can be disabled in Mod Settings.", .001f));
             //if (endless) MelonCoroutines.Start(StartTimer());
             //else modifiersLoaded = true;
-            MelonCoroutines.Start(WaitForArenaSwitch());
+            MelonCoroutines.Start(WaitForArenaSwitch(fromRestart));
             //modifiersLoaded = true;
         }
 
-        private static IEnumerator WaitForArenaSwitch()
+
+        private static IEnumerator WaitForArenaSwitch(bool fromRestart)
         {
             while (EnvironmentLoader.I.IsSwitching())
             {
@@ -169,6 +173,7 @@ namespace AuthorableModifiers
             }
             modifiersLoaded = true;
             defaultSkyboxColor = RenderSettings.skybox.GetColor("_Tint");
+            if (fromRestart) AudioDriver.I.Resume();
         }
 
         private static void EnableAutoLightshow(bool enable)
@@ -390,10 +395,21 @@ namespace AuthorableModifiers
             RenderSettings.skybox.SetFloat("_Rotation", rotation);
             ArenaLoaderMod.CurrentSkyboxReflection = 0f;
             ArenaLoaderMod.ChangeReflectionStrength(reflection);
+            RenderSettings.skybox.SetColor("_Tint", defaultSkyboxColor);
         }
 
         public override void OnUpdate()
         {
+            /*if (Input.GetKeyDown(KeyCode.L))
+            {
+                AutoPlayer.EnableAutoplayer(!AutoPlayer.I.IsAutoPlayerEnabled);
+                MelonLogger.Msg("Auto player is " + (AutoPlayer.I.IsAutoPlayerEnabled ? "enabled" : "disabled"));
+
+            }
+            if (Input.GetKeyDown(KeyCode.P) && MenuState.sState == MenuState.State.Launched)
+            {
+                InGameUI.I.GoToPausePage(true);
+            }*/
             /*if (Input.GetKeyDown(KeyCode.L))
             {
                 ApiController.isRunning = true;

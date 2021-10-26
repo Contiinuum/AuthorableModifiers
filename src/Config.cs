@@ -53,8 +53,6 @@ namespace AuthorableModifiers
                 else if (fieldInfo.FieldType == typeof(float)) fieldInfo.SetValue(null, MelonPreferences.GetEntryValue<float>(Category, fieldInfo.Name));
                 else if (fieldInfo.FieldType == typeof(string)) fieldInfo.SetValue(null, MelonPreferences.GetEntryValue<string>(Category, fieldInfo.Name));
             }
-
-            AuthorableModifiersMod.modifiersFound = false;
         }
     }
 }
