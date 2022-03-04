@@ -28,6 +28,7 @@ namespace AuthorableModifiers
         public override void Activate()
         {
             base.Activate();
+            if (AuthorableModifiersMod.skyboxLimitSet) Amount *= AuthorableModifiersMod.skyboxLimit;
             if (!Continuous) Amount *= Config.intensity;
 
             if (Strobo)
@@ -67,7 +68,11 @@ namespace AuthorableModifiers
                     ArenaLoaderMod.CurrentSkyboxExposure = 0f;
                     ArenaLoaderMod.CurrentSkyboxReflection = 0f;
                     float amnt = AuthorableModifiersMod.defaultArenaBrightness * dir;
-                    if (dir == 1) amnt *= Config.intensity;
+                    if (dir == 1)
+                    {
+                        amnt *= Config.intensity;
+                        if (AuthorableModifiersMod.skyboxLimitSet) amnt *= AuthorableModifiersMod.skyboxLimit;
+                    }
                     ArenaLoaderMod.ChangeExposure(amnt);
 
                     //float newReflection = amnt / AuthorableModifiersMod.defaultArenaBrightness;

@@ -5,9 +5,8 @@ using UnityEngine;
 using System.Linq;
 using System.Collections;
 using ArenaLoader;
-using AutoLightshow;
 using AudicaModding;
-
+using AutoLightshow;
 namespace AuthorableModifiers
 {
     public class AuthorableModifiersMod : MelonMod
@@ -44,6 +43,8 @@ namespace AuthorableModifiers
         public static Dictionary<float, DebugTextPopup> popupTextDictionary = new Dictionary<float, DebugTextPopup>();
         public static bool lightshowWasEnabled = false;
         public static Vector3 lastRotationEndValue = Vector3.zero;
+        public static float skyboxLimit = 0f;
+        public static bool skyboxLimitSet => skyboxLimit > 0f;
         public static class BuildInfo
         {
             public const string Name = "AuthorableModifiers";  // Name of the Mod.  (MUST BE SET)
@@ -90,12 +91,16 @@ namespace AuthorableModifiers
             {
                 m.Activate();
             }
+            if (autoLightings is null || autoLightings.Count == 0) return;
             autoLightings.Sort((a1, a2) => a1.StartTick.CompareTo(a2.StartTick));
-            foreach (AutoLighting al in autoLightings)
+            List<Tuple<float, float>> timeSpans = new List<Tuple<float, float>>();
+            foreach (AutoLighting al in autoLightings) timeSpans.Add(new Tuple<float, float>(al.StartTick, al.EndTick));
+            autoLightings.First().Preload(timeSpans, autoLightings.Last().EndTick);
+            /*foreach (AutoLighting al in autoLightings)
             {
                 al.Preload();
                 //break;
-            }
+            }*/
         }
         public static bool modifiersLoaded = false;
         public static void LoadModifierCues(bool fromRestart = false)
@@ -334,7 +339,7 @@ namespace AuthorableModifiers
                     new ColorChange() { }.UpdateColors(oldLeftHandColor, oldRightHandColor);
                 }
             }
-            
+            skyboxLimit = 0f;
             modifierQueue.Clear();
             awaitDisableModifiers.Clear();
             awaitEnableModifiers.Clear();

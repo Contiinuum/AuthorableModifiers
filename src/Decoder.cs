@@ -295,7 +295,7 @@ namespace AuthorableModifiers
                                             Type = type,
                                             StartTick = startTick,
                                             EndTick = endTick,
-                                            Amount = amount,
+                                            Amount = amountPercentage,
                                             Continuous = option1,
                                             Strobo = option2,
                                             IsSingleUse = !option1 && !option2
@@ -309,6 +309,16 @@ namespace AuthorableModifiers
                                             );*/
                                         //if (!modifiersJSON["modifiers"][i]["option1"] && !modifiersJSON["modifiers"][i]["option2"]) modifierCue.IsSingleUse = true;
                                         //if (!Config.enableFlashingLights && modifiersJSON["modifiers"][i]["option2"]) continue;
+                                        break;
+                                    case ModifierType.SkyboxLimiter:
+                                        modifierCue = new SkyboxLimiter()
+                                        {
+                                            Type = type,
+                                            StartTick = startTick,
+                                            EndTick = 0f,
+                                            Amount = amountPercentage,
+                                            IsSingleUse = true
+                                        };
                                         break;
                                     case ModifierType.Fader:
                                         if (!Integrations.arenaLoaderFound || !Config.enableFlashingLights) continue;

@@ -39,6 +39,7 @@ namespace AuthorableModifiers
         private  int startIndex = 0;
         private readonly static List<BrightnessEvent> brightnessEvents = new List<BrightnessEvent>();
         private readonly static List<PsyEvent> psyEvents = new List<PsyEvent>();
+        private static List<Tuple<float, float>> activeTimes;
 
         /*public AutoLighting(ModifierType _type, float _startTick, float _endTick, float _maxBrightness, bool _pulseMode)
         {
@@ -61,10 +62,11 @@ namespace AuthorableModifiers
             StopLightshow();
         }
 
-        public void Preload()
+        public void Preload(List<Tuple<float, float>> timeSpans, float newEndTick)
         {
             if (!Integrations.arenaLoaderFound || !Config.enabled) return;
-            
+            activeTimes = timeSpans;
+            EndTick = newEndTick;
             Task.Run(() => PrepareLightshow());           
         }
 
@@ -277,8 +279,16 @@ namespace AuthorableModifiers
                                 {
                                     be.endTick = end;
                                 }
-                                brightnessEvents.RemoveAt(brightnessEvents.Count - 1);
-                                brightnessEvents.Add(be);
+                                if(brightnessEvents.Count >= 1)
+                                {
+                                    brightnessEvents.RemoveAt(brightnessEvents.Count - 1);
+                                    brightnessEvents.Add(be);
+                                }
+                                if (psyEvents.Count > 0)
+                                {
+                                    if (psyEvents.Last().startTick != cue.tick) PreparePsychedelia(cue);
+                                }
+
                             }
                         }
                         else
@@ -329,16 +339,33 @@ namespace AuthorableModifiers
             return (float)(.5f + sign * Math.Tanh(intensityWeight * intensity) / 2) * maxBrightness;
         }
 
+        private bool IsDuringActiveTime(BrightnessEvent brightnessEvent)
+        {
+            return IsActive(brightnessEvent.startTick, brightnessEvent.endTick);           
+        }
+
+        private bool IsActive(float start, float end)
+        {
+            return activeTimes.Any(span => span.Item1 <= start && span.Item2 >= end);
+        }
+
+        private bool IsDuringActiveTime(PsyEvent psyEvent)
+        {
+            return IsActive(psyEvent.startTick, psyEvent.endTick);
+        }
+
         private IEnumerator BetterLightshow()
         {
             //List<SongCues.Cue> cues = SongCues.I.mCues.cues.ToList();
             for(int i = brightnessEvents.Count - 1; i >= 0; i--)
             {
                 if (brightnessEvents[i].startTick < AudioDriver.I.mCachedTick) brightnessEvents.RemoveAt(i);
+                else if (!IsDuringActiveTime(brightnessEvents[i])) brightnessEvents.RemoveAt(i);
             }
             for(int i = psyEvents.Count - 1; i >= 0; i--)
             {
                 if (psyEvents[i].startTick < AudioDriver.I.mCachedTick) psyEvents.RemoveAt(i);
+                else if (!IsDuringActiveTime(psyEvents[i])) psyEvents.RemoveAt(i);
             }
             /*BrightnessEvent be = brightnessEvents[0];
             be.brightness = be.previousSectionBrightness;
@@ -402,6 +429,9 @@ namespace AuthorableModifiers
                     break;
                 case Hitsound.Melee:
                     amount = (maxBrightness / 100f) * 80f;
+                    break;
+                case Hitsound.Silent:
+                    amount = 0f;
                     break;
                 default:
                     break;
@@ -575,7 +605,8 @@ namespace AuthorableModifiers
             Melee = 3,
             Kick = 20,
             Percussion = 60,
-            Snare = 127
+            Snare = 127,
+            Silent = 999
         }
 
         public struct BrightnessEvent

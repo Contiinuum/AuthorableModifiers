@@ -226,6 +226,7 @@
     <Compile Include="src\Modifiers\ColorChange.cs" />
     <Compile Include="src\Modifiers\PsyschedeliaUpdate.cs" />
     <Compile Include="src\Modifiers\SkyboxColor.cs" />
+    <Compile Include="src\Modifiers\SkyboxLimiter.cs" />
     <Compile Include="src\Modifiers\SpeedChange.cs" />
     <Compile Include="src\Modifiers\TextPopup.cs" />
     <Compile Include="src\Modifiers\ZOffset.cs" />

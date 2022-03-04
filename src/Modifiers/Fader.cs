@@ -26,6 +26,7 @@ namespace AuthorableModifiers
 
             if (Amount > AuthorableModifiersMod.defaultArenaBrightness) Amount = AuthorableModifiersMod.defaultArenaBrightness;
             Amount *= Config.intensity;
+            if (AuthorableModifiersMod.skyboxLimitSet) Amount *= AuthorableModifiersMod.skyboxLimit;
             MelonCoroutines.Start(Fade());
 
         }
